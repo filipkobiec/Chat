@@ -3,7 +3,7 @@ import './App.css';
 import * as signalR from "@microsoft/signalr"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Lobby from "./components/Lobby";
-import Chat from "./components/Chat";
+import Room from "./components/Room";
 import { LogLevel } from "@microsoft/signalr";
 import Message from "./models/Message";
 import UserModel from "./models/UserModel";
@@ -19,6 +19,7 @@ import {
 function App() {
     const [connection, setConnection] = useState<signalR.HubConnection>();
     const [messages, setMessages] = useState<Message[]>([]);
+    const [players, setPlayers] = useState<UserModel[]>([]);
     const joinRoom = async (user: UserModel, room : string) => {
         try {
             const connection = new signalR.HubConnectionBuilder()
@@ -29,6 +30,10 @@ function App() {
             connection.on("ReceiveMessage", (user: string, message: string) => {
                 setMessages(messages => [...messages, {user, message}]);
             });
+
+            connection.on("UpdatePlayers", (players: UserModel[]) => {
+                setPlayers(players)
+            })
 
             connection.onclose(e => {
                 setConnection(undefined);
@@ -69,8 +74,8 @@ function App() {
                         <Lobby joinRoom={joinRoom}/>
                     </Route>
                     <Route path="/room/:id">
-                        <Chat messages={messages} sendMessage={sendMessage} 
-                        closeConnection={closeConnection}/>
+                        <Room messages={messages} sendMessage={sendMessage} 
+                        closeConnection={closeConnection} players={players}/>
                     </Route>
                 </Switch>
             </Router>

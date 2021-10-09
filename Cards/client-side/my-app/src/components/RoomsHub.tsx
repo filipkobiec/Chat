@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
+import UserModel from "../models/UserModel";
 
 function RoomsHub({joinRoom} : {joinRoom : any}) {
     
@@ -21,16 +22,20 @@ function RoomsHub({joinRoom} : {joinRoom : any}) {
         <Form className="hubs-container"
             onSubmit={e => {
                 e.preventDefault();
-                joinRoom(user, room);
+                const userModel : UserModel = {
+                    name : user,
+                    isAdmin : true,
+                    points : 0
+                }
+                joinRoom(userModel, room);
                 history.push(`room/${room}`)
             }}
         >
             
             <Form.Control placeholder="name" onChange={e => setUser(e.target.value)} />
-            {console.log(rooms)}
             {
-                rooms.map(element => 
-                        (<div>
+                rooms.map((element, index) => 
+                        (<div key={index}>
                             <h3>{element}</h3>
                             <Button variant="success" type="submit" disabled={!user} onClick={() => room=element}>Join</Button>
                         </div>

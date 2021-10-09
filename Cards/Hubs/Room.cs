@@ -7,11 +7,11 @@ namespace Cards.Hubs
 {
     public class Room
     {
-        public List<UserConnection> userConnections { get; }
+        public List<UserModel> UserModels { get; }
         public string roomName { get; }
         public Room(string roomName)
         {
-            userConnections = new List<UserConnection>();
+            UserModels = new List<UserModel>();
             this.roomName = roomName;
         }
 

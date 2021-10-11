@@ -79,7 +79,7 @@ function App() {
 
     const CloseRoomConnection = async () => {
         try {
-            await connection?.invoke("CloseRoomConnection", );
+            await connection?.invoke("CloseRoomConnection");
         } catch (e) {
             console.log(e)
         }

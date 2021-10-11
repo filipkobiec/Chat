@@ -77,11 +77,11 @@ namespace Cards.Hubs
             }
             else
             {
+                currentRoom.UserModels[0].IsAdmin = true;
                 await Clients.Group(userConnection.Room)
                    .SendAsync("ReceiveMessage", _botUser, $"{userConnection.User.Name} has left");
                 await Clients.Client(Context.ConnectionId)
                     .SendAsync("ReceiveRooms", _rooms.Values);
-
                 await Clients.Group(userConnection.Room).SendAsync("UpdatePlayers", _rooms[userConnection.Room].UserModels);
             }
         }

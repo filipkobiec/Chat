@@ -13,7 +13,7 @@ function Lobby({ joinRoom }: any) {
                 e.preventDefault();
                 const userModel : UserModel = {
                     name : user,
-                    isAdmin : true,
+                    isAdmin : false,
                     points : 0
                 }
                 joinRoom(userModel, room);

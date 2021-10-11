@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import './App.css';
 import * as signalR from "@microsoft/signalr"
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -7,6 +7,7 @@ import Room from "./components/Room";
 import { LogLevel } from "@microsoft/signalr";
 import Message from "./models/Message";
 import UserModel from "./models/UserModel";
+import RoomModel from "./models/RoomModel"
 import RoomsHub from "./components/RoomsHub"
 import {
     BrowserRouter as Router,
@@ -20,7 +21,13 @@ function App() {
     const [connection, setConnection] = useState<signalR.HubConnection>();
     const [messages, setMessages] = useState<Message[]>([]);
     const [players, setPlayers] = useState<UserModel[]>([]);
-    const joinRoom = async (user: UserModel, room : string) => {
+    const [rooms, setRooms] = useState<RoomModel[]>([]);
+    
+    useEffect(() => {
+        makeConnection();
+    }, [])
+    
+    const makeConnection = async () => {
         try {
             const connection = new signalR.HubConnectionBuilder()
                 .withUrl("https://localhost:44319/chat")
@@ -35,14 +42,28 @@ function App() {
                 setPlayers(players)
             })
 
+            connection.on("ReceiveRooms", (rooms: RoomModel[]) => {
+                setRooms(rooms);
+            })
+
             connection.onclose(e => {
                 setConnection(undefined);
                 setMessages([]);
             })
 
             await connection.start();
-            await connection.invoke("JoinRoom", { user, room })
+            await connection.invoke("GetRooms")
             setConnection(connection);
+        }
+        catch (e) {
+            console.log(e);
+        }
+
+        
+    }
+    const joinRoom = async (user: UserModel, room : string) => {
+        try {
+            await connection?.invoke("JoinRoom", { user, room })
         } catch (e) {
             console.log(e);
         }
@@ -56,13 +77,14 @@ function App() {
       }
     };
 
-    const closeConnection = async () => {
+    const CloseRoomConnection = async () => {
         try {
-            await connection?.stop();
+            await connection?.invoke("CloseRoomConnection", );
         } catch (e) {
             console.log(e)
         }
     }
+
     return (
         <div className="app">
             <h2>MyChat</h2>
@@ -70,12 +92,12 @@ function App() {
             <Router>
                 <Switch>
                     <Route exact path="/">
-                        <RoomsHub joinRoom={joinRoom}/>
+                        <RoomsHub joinRoom={joinRoom} rooms={rooms}/>
                         <Lobby joinRoom={joinRoom}/>
                     </Route>
                     <Route path="/room/:id">
                         <Room messages={messages} sendMessage={sendMessage} 
-                        closeConnection={closeConnection} players={players}/>
+                        closeRoomConnection={CloseRoomConnection} players={players}/>
                     </Route>
                 </Switch>
             </Router>

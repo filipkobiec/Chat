@@ -3,28 +3,20 @@ import { Button, Form } from "react-bootstrap"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
 import UserModel from "../models/UserModel";
+import RoomModel from "../models/RoomModel";
 
-function RoomsHub({joinRoom} : {joinRoom : any}) {
+function RoomsHub({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
     
     const [user, setUser] = useState('');
-    const [rooms, setRooms] = useState<string[]>([]);
     const history = useHistory();
     let room : string;
-        useEffect(() => {
-            axios.get('https://localhost:44319/hubs')
-            .then(response => {
-                setRooms(response.data);
-                console.log(rooms)
-            })
-        }, []);
-  
     return (
         <Form className="hubs-container"
             onSubmit={e => {
                 e.preventDefault();
                 const userModel : UserModel = {
                     name : user,
-                    isAdmin : true,
+                    isAdmin : false,
                     points : 0
                 }
                 joinRoom(userModel, room);
@@ -36,8 +28,8 @@ function RoomsHub({joinRoom} : {joinRoom : any}) {
             {
                 rooms.map((element, index) => 
                         (<div key={index}>
-                            <h3>{element}</h3>
-                            <Button variant="success" type="submit" disabled={!user} onClick={() => room=element}>Join</Button>
+                            <h3>{element.roomName}</h3>
+                            <Button variant="success" type="submit" disabled={!user} onClick={() => room=element.roomName}>Join</Button>
                         </div>
                         )
             )}

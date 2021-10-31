@@ -33,6 +33,7 @@ namespace Cards.Hubs
                 currentRoom= new Room(userConnection.Room);
                 var user = userConnection.User;
                 user.IsAdmin = true;
+                user.IsPlayerTurn = true;
                 currentRoom.UserModels.Add(user);
                 _rooms[userConnection.Room] = currentRoom;
                 await Clients.Group("Lobby")

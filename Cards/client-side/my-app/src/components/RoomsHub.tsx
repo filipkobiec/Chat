@@ -17,7 +17,8 @@ function RoomsHub({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
                 const userModel : UserModel = {
                     name : user,
                     isAdmin : false,
-                    points : 0
+                    points : 0,
+                    isPlayerTurn : false
                 }
                 joinRoom(userModel, room);
                 history.push(`room/${room}`)

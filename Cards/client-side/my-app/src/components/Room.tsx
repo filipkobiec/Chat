@@ -1,10 +1,7 @@
-import MessageContainer from "./MessageContainer";
 import Chat from "./Chat";
 import Message from "../models/Message"
-import SendMessageForm from "./SendMessageForm"
 import {Button} from "react-bootstrap"
 import {useHistory} from "react-router-dom"
-import React from "react";
 import UserModel from "../models/UserModel";
 
 function Room({ messages, sendMessage, closeRoomConnection, players } : {messages : Message[], sendMessage : any, closeRoomConnection : any, players: UserModel[]}) {

@@ -68,6 +68,7 @@ function App() {
         }
     }
     const joinRoom = async (user: UserModel, room : string) => {
+        setMessages([])
         try {
             await connection?.invoke("JoinRoom", { user, room })
         } catch (e) {

@@ -27,7 +27,6 @@ namespace Cards.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
 
             Room currentRoom;
-
             if (!_rooms.ContainsKey(userConnection.Room))
             {
                 currentRoom= new Room(userConnection.Room);
@@ -44,6 +43,7 @@ namespace Cards.Hubs
                 currentRoom = _rooms[userConnection.Room];
                 currentRoom.UserModels.Add(userConnection.User);
             }
+            await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", userConnection.User);
             await Clients.Group(userConnection.Room).SendAsync("UpdatePlayers", currentRoom.UserModels);
 
         }

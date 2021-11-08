@@ -21,6 +21,10 @@ function App() {
     const [connection, setConnection] = useState<signalR.HubConnection>();
     const [messages, setMessages] = useState<Message[]>([]);
     const [players, setPlayers] = useState<UserModel[]>([]);
+    const [player, setPlayer] = useState<UserModel>({ name : "default",
+        isAdmin : false,
+        points : 0,
+        isPlayerTurn : false});
     const [rooms, setRooms] = useState<RoomModel[]>([]);
     
     useEffect(() => {
@@ -46,6 +50,10 @@ function App() {
                 setRooms(rooms);
             })
 
+            connection.on("SetPlayer", (user: UserModel) => {
+                setPlayer(user);
+            })
+
             connection.onclose(e => {
                 setConnection(undefined);
                 setMessages([]);
@@ -58,8 +66,6 @@ function App() {
         catch (e) {
             console.log(e);
         }
-
-        
     }
     const joinRoom = async (user: UserModel, room : string) => {
         try {
@@ -97,13 +103,11 @@ function App() {
                     </Route>
                     <Route path="/room/:id">
                         <Room messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={CloseRoomConnection} players={players}/>
+                        closeRoomConnection={CloseRoomConnection} players={players} player={player}/>
                     </Route>
                 </Switch>
             </Router>
         </div>
     );
 };
-
-
 export default App;

@@ -3,8 +3,9 @@ import Message from "../models/Message"
 import {Button} from "react-bootstrap"
 import {useHistory} from "react-router-dom"
 import UserModel from "../models/UserModel";
+import CardGame from "./CardGame"
 
-function Room({ messages, sendMessage, closeRoomConnection, players } : {messages : Message[], sendMessage : any, closeRoomConnection : any, players: UserModel[]}) {
+function Room({ messages, sendMessage, closeRoomConnection, players, player } : {messages : Message[], sendMessage : any, closeRoomConnection : any, players: UserModel[], player: UserModel}) {
     const history = useHistory();
     return(
         <div>
@@ -26,6 +27,7 @@ function Room({ messages, sendMessage, closeRoomConnection, players } : {message
                             </div>
                             <div>
                                 Admin
+                                {p.isPlayerTurn}
                             </div>
                             <div>
                                 {p.points}
@@ -46,9 +48,10 @@ function Room({ messages, sendMessage, closeRoomConnection, players } : {message
                 }
                 )}
             </div>
+            <CardGame player={player} players={players}></CardGame>
             <Chat messages = {messages} sendMessage = {sendMessage}></Chat>
         </div>
     )
 }
 
-export default Room
+export default Room 

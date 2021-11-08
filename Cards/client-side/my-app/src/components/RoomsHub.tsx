@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap"
-import axios from "axios"
 import { useHistory } from "react-router-dom"
 import UserModel from "../models/UserModel";
 import RoomModel from "../models/RoomModel";
@@ -32,7 +31,7 @@ function RoomsHub({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
                             <h3>{element.roomName}</h3>
                             <Button variant="success" type="submit" disabled={!user} onClick={() => room=element.roomName}>Join</Button>
                         </div>
-                        )
+                    )
             )}
         </Form>
     );

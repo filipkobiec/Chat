@@ -22,12 +22,7 @@ namespace Cards.Hubs
         {
             var roomName = userConnection.Room;
             var user = userConnection.User;
-
-            await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
-            _connections[Context.ConnectionId] = userConnection;
-            await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser ,
-                $"{userConnection.User.Name} has joined {userConnection.Room}");
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
+            await HandleJoiningRoomByClient(userConnection);
 
             Room currentRoom;
             if (_roomManager.IsRoomCreated(roomName))
@@ -38,11 +33,9 @@ namespace Cards.Hubs
             {
                 currentRoom = _roomManager.CreateRoom(roomName, user);
                 var allRooms = _roomManager.GetAllRooms();
-                await Clients.Group("Lobby")
-                    .SendAsync("ReceiveRooms", allRooms);
+                await SendRoomsToClients();
             }
-            await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", user);
-            await Clients.Group(userConnection.Room).SendAsync("UpdatePlayers", currentRoom.UserModels);
+            await SendPlayersToClient(userConnection, user, currentRoom);
 
         }
         public async Task SendMessage(string message)
@@ -57,7 +50,7 @@ namespace Cards.Hubs
         public async Task GetRooms()
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Lobby");
-            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRooms", _roomManager.GetAllRooms());
+            await SendRoomsToClients();
         }
 
         public async Task CloseRoomConnection()
@@ -71,8 +64,7 @@ namespace Cards.Hubs
             if (currentRoom.IsRoomEmpty)
             {
                 _roomManager.RemoveRoom(currentRoom.roomName);
-                await Clients.Group("Lobby")
-                   .SendAsync("ReceiveRooms", _roomManager.GetAllRooms());
+                await SendRoomsToClients();
             }
             else
             {
@@ -80,12 +72,10 @@ namespace Cards.Hubs
                 _roomManager.SaveRoom(currentRoom);
                 await Clients.Group(userConnection.Room)
                    .SendAsync("ReceiveMessage", _botUser, $"{userConnection.User.Name} has left");
-                await Clients.Client(Context.ConnectionId)
-                    .SendAsync("ReceiveRooms", _roomManager.GetAllRooms());
+                await SendRoomsToClients();
                 await Clients.Group(userConnection.Room).SendAsync("UpdatePlayers", currentRoom.UserModels);
             }
         }
-
         public override Task OnDisconnectedAsync(Exception exception)
         {
             if(_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
@@ -105,6 +95,25 @@ namespace Cards.Hubs
                     .SendAsync("UpdatePlayers", currentRoom.UserModels);
             }
             return base.OnDisconnectedAsync(exception);
+        }
+        private async Task HandleJoiningRoomByClient(UserConnection userConnection)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
+            _connections[Context.ConnectionId] = userConnection;
+            await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser,
+                $"{userConnection.User.Name} has joined {userConnection.Room}");
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
+        }
+
+        private async Task SendPlayersToClient(UserConnection userConnection, UserModel user, Room currentRoom)
+        {
+            await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", user);
+            await Clients.Group(userConnection.Room).SendAsync("UpdatePlayers", currentRoom.UserModels);
+        }
+        private async Task SendRoomsToClients()
+        {
+            await Clients.Group("Lobby")
+                .SendAsync("ReceiveRooms", _roomManager.GetAllRooms());
         }
     }
 }

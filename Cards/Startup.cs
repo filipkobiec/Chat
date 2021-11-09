@@ -41,7 +41,7 @@ namespace Cards
                 });
             });
             services.AddSingleton<IDictionary<string, UserConnection>>(opts => new ConcurrentDictionary<string, UserConnection>());
-            services.AddSingleton<IDictionary<string, Room>>(opts => new ConcurrentDictionary<string, Room>());
+            services.AddSingleton<IRoomManager, InMemoryRoomManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

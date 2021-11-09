@@ -32,7 +32,6 @@ namespace Cards.Hubs
             else
             {
                 currentRoom = _roomManager.CreateRoom(roomName, user);
-                var allRooms = _roomManager.GetAllRooms();
                 await SendRoomsToClients();
             }
             await SendPlayersToClient(userConnection, user, currentRoom);

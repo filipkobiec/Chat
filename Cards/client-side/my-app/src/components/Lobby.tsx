@@ -11,12 +11,8 @@ function Lobby({ joinRoom }: any) {
         <Form className="lobby"
             onSubmit={e => {
                 e.preventDefault();
-                const userModel : UserModel = {
-                    name : user,
-                    isAdmin : false,
-                    points : 0,
-                    isPlayerTurn : false
-                }
+                const userModel = new UserModel();
+                userModel.name = user;
                 joinRoom(userModel, room);
                 history.push(`room/${room}`)
             }}

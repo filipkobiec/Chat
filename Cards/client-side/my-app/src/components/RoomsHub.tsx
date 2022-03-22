@@ -13,12 +13,9 @@ function RoomsHub({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
         <Form className="hubs-container"
             onSubmit={e => {
                 e.preventDefault();
-                const userModel : UserModel = {
-                    name : user,
-                    isAdmin : false,
-                    points : 0,
-                    isPlayerTurn : false
-                }
+                const userModel = new UserModel();
+                userModel.name = user;
+
                 joinRoom(userModel, room);
                 history.push(`room/${room}`)
             }}

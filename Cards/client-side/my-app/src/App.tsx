@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import './App.css';
+import './scss/App.scss';
 import * as signalR from "@microsoft/signalr"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Lobby from "./components/Lobby";
-import Room from "./components/Room";
+import Room from "./components/room/Room";
 import { LogLevel } from "@microsoft/signalr";
 import Message from "./models/Message";
 import UserModel from "./models/UserModel";
@@ -21,10 +21,7 @@ function App() {
     const [connection, setConnection] = useState<signalR.HubConnection>();
     const [messages, setMessages] = useState<Message[]>([]);
     const [players, setPlayers] = useState<UserModel[]>([]);
-    const [player, setPlayer] = useState<UserModel>({ name : "default",
-        isAdmin : false,
-        points : 0,
-        isPlayerTurn : false});
+    const [player, setPlayer] = useState<UserModel>(new UserModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);
     
     useEffect(() => {
@@ -92,6 +89,16 @@ function App() {
         }
     }
 
+    
+    const StartGame = async (room: string, player: UserModel) => {
+        try {
+            await connection?.invoke("StartGame", room, player);
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+
     return (
         <div className="app">
             <h2>MyChat</h2>
@@ -104,7 +111,7 @@ function App() {
                     </Route>
                     <Route path="/room/:id">
                         <Room messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={CloseRoomConnection} players={players} player={player}/>
+                        closeRoomConnection={CloseRoomConnection} players={players} player={player} startGame={StartGame}/>
                     </Route>
                 </Switch>
             </Router>

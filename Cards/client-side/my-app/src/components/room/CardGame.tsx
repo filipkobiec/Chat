@@ -1,4 +1,4 @@
-import UserModel from "../models/UserModel";
+import UserModel from "../../models/UserModel";
 
 function CardGame({players, player} : {players: UserModel[], player: UserModel}) {
     if (player.isPlayerTurn){

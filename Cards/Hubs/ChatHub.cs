@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Cards.Hubs.Models;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace Cards.Hubs
         {
             var roomName = userConnection.Room;
             var user = userConnection.User;
+            user.Id = Guid.NewGuid();
             await HandleJoiningRoomByClient(userConnection);
 
             Room currentRoom;
@@ -49,6 +51,23 @@ namespace Cards.Hubs
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Lobby");
             await SendRoomsToClients();
+        }
+
+        public async Task StartGame(string roomName, UserModel clientPlayer)
+        {
+            var currentRoom = _roomManager.GetRoom(roomName);
+            var players = currentRoom.UserModels;
+
+            foreach (var player in players)
+            {
+                player.Cards = new List<CardModel>();
+                for (int i = 0; i < 10; i++)
+                {
+                    player.Cards.Add(new CardModel(i.ToString(), player.Id));
+                }
+            }
+            await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", players[0]);
+            await Clients.Group(roomName).SendAsync("UpdatePlayers", players);
         }
 
         public async Task CloseRoomConnection()

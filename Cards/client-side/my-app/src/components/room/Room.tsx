@@ -7,7 +7,7 @@ import UserModel from "../../models/UserModel";
 import CardGame from "./CardGame"
 import WhiteCard from "../cards/WhiteCard";
 
-function Room({ messages, sendMessage, closeRoomConnection, players, player, startGame } : {messages : Message[], sendMessage : any, closeRoomConnection : any, players: UserModel[], player: UserModel, startGame: any}) {
+function Room({ messages, sendMessage, closeRoomConnection, players, player, startGame, sendCardPlayerChose} : {messages : Message[], sendMessage : any, closeRoomConnection : any, players: UserModel[], player: UserModel, startGame: any, sendCardPlayerChose: any}) {
     const history = useHistory();
     const { id } = useParams() as {id: string};
     return(
@@ -57,9 +57,8 @@ function Room({ messages, sendMessage, closeRoomConnection, players, player, sta
                 >Start Game</Button>
             </div>
             {player.cards.map((c, index) => {
-                console.log(c)
                 return(
-                    <WhiteCard text={c.text}/>
+                    <WhiteCard player={player} card={c} sendCardPlayerChose={sendCardPlayerChose}  key={index}/>
                 )
             })}
             <CardGame player={player} players={players}></CardGame>

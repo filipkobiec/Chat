@@ -23,6 +23,7 @@ namespace Cards.Hubs
             var roomName = userConnection.Room;
             var user = userConnection.User;
             user.Id = Guid.NewGuid();
+            user.ConnectionId = Context.ConnectionId;
             await HandleJoiningRoomByClient(userConnection);
 
             Room currentRoom;
@@ -65,9 +66,14 @@ namespace Cards.Hubs
                 {
                     player.Cards.Add(new CardModel(i.ToString(), player.Id));
                 }
+                await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);
             }
-            await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", players[0]);
             await Clients.Group(roomName).SendAsync("UpdatePlayers", players);
+        }
+
+        public async Task GetChosenCard(UserModel player, CardModel userCard)
+        {
+            await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);
         }
 
         public async Task CloseRoomConnection()

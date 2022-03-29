@@ -14,6 +14,7 @@ import {
     Route,
     Switch,
 } from "react-router-dom";
+import CardModel from "./models/CardModel";
 
 
 
@@ -81,6 +82,14 @@ function App() {
       }
     };
 
+    const sendCardPlayerChose = async (player: UserModel, userCard: CardModel) => {
+        try {
+            await connection?.invoke("GetChosenCard", { player, userCard })
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     const CloseRoomConnection = async () => {
         try {
             await connection?.invoke("CloseRoomConnection");
@@ -111,7 +120,7 @@ function App() {
                     </Route>
                     <Route path="/room/:id">
                         <Room messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={CloseRoomConnection} players={players} player={player} startGame={StartGame}/>
+                        closeRoomConnection={CloseRoomConnection} players={players} player={player} startGame={StartGame} sendCardPlayerChose={sendCardPlayerChose}/>
                     </Route>
                 </Switch>
             </Router>

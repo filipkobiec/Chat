@@ -71,7 +71,7 @@ namespace Cards.Hubs
             await Clients.Group(roomName).SendAsync("UpdatePlayers", players);
         }
 
-        public async Task GetChosenCard(UserModel player, CardModel userCard)
+        public async Task GetChosenCard(UserModel player, CardModel card)
         {
             await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);
         }

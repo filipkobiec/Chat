@@ -84,7 +84,7 @@ function App() {
 
     const sendCardPlayerChose = async (player: UserModel, userCard: CardModel) => {
         try {
-            await connection?.invoke("GetChosenCard", { player, userCard })
+            await connection?.invoke("GetChosenCard",  player, userCard )
         } catch (e) {
             console.log(e);
         }

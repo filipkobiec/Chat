@@ -59,7 +59,13 @@ function Room({ room, messages, sendMessage, closeRoomConnection, player, startG
                     >Start Game</Button>
                 </div>
             }
-  
+
+            {room.blackCard &&
+                <div>
+                    {room.blackCard.text}
+                </div>
+            }
+            
             {player.cards.map((c, index) => {
                 return(
                     <WhiteCard player={player} card={c} sendCardPlayerChose={sendCardPlayerChose}  key={index}/>

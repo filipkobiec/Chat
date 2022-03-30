@@ -11,12 +11,18 @@ namespace Cards.Hubs
         private readonly string _botUser;
         private readonly IDictionary<string, UserConnection> _connections;
         private readonly IRoomManager _roomManager;
+        private readonly List<CardModel> _blackCards;
 
         public ChatHub(IDictionary<string, UserConnection> _connections, IRoomManager roomManager)
         {
             _botUser = "MyChat Bot";
             this._connections = _connections;
             _roomManager = roomManager;
+            _blackCards = new List<CardModel>();
+            for (int i = 0; i < 10; i++)
+            {
+                _blackCards.Add(new CardModel(i.ToString()));
+            }
         }
         public async Task JoinRoom(UserConnection userConnection)
         {
@@ -55,12 +61,19 @@ namespace Cards.Hubs
         public async Task StartGame(string roomName, UserModel clientPlayer)
         {
             var currentRoom = _roomManager.GetRoom(roomName);
+            currentRoom.BlackCards = _blackCards;
+            currentRoom.BlackCard = currentRoom.BlackCards[0];
             var players = currentRoom.UserModels;
 
             foreach (var player in players)
             {
                 if (player.IsAdmin)
+                {
                     player.IsPlayerCardChar = true;
+                    player.IsPlayerTurn = false;
+                }
+                else
+                    player.IsPlayerTurn = true;
 
                 player.Cards = new List<CardModel>();
                 for (int i = 0; i < 10; i++)
@@ -69,11 +82,12 @@ namespace Cards.Hubs
                 }
                 await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);
             }
-            await Clients.Group(roomName).SendAsync("UpdatePlayers", players);
+            await Clients.Group(roomName).SendAsync("UpdateRoom", currentRoom);
         }
 
         public async Task GetChosenCard(UserModel player, CardModel card)
         {
+            player.IsPlayerTurn = false;
             await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);
         }
 

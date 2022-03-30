@@ -26,17 +26,15 @@ namespace Cards.Hubs
             user.ConnectionId = Context.ConnectionId;
             await HandleJoiningRoomByClient(userConnection);
 
-            Room currentRoom;
+            RoomModel currentRoom;
             if (_roomManager.IsRoomCreated(roomName))
-            {
                 currentRoom = _roomManager.AddUserToRoom(roomName, user);
-            }
             else
             {
                 currentRoom = _roomManager.CreateRoom(roomName, user);
                 await SendRoomsToClients();
             }
-            await SendPlayersToClient(userConnection, user, currentRoom);
+            await SendPlayersToClient(user, currentRoom);
 
         }
         public async Task SendMessage(string message)
@@ -61,6 +59,9 @@ namespace Cards.Hubs
 
             foreach (var player in players)
             {
+                if (player.IsAdmin)
+                    player.IsPlayerCardChar = true;
+
                 player.Cards = new List<CardModel>();
                 for (int i = 0; i < 10; i++)
                 {
@@ -91,12 +92,14 @@ namespace Cards.Hubs
             }
             else
             {
-                currentRoom.UserModels[0].IsAdmin = true;
+                var newAdmin = currentRoom.UserModels[0];
+                newAdmin.IsAdmin = true;
                 _roomManager.SaveRoom(currentRoom);
                 await Clients.Group(userConnection.Room)
                    .SendAsync("ReceiveMessage", _botUser, $"{userConnection.User.Name} has left");
                 await SendRoomsToClients();
-                await Clients.Group(userConnection.Room).SendAsync("UpdatePlayers", currentRoom.UserModels);
+                await Clients.Client(newAdmin.ConnectionId).SendAsync("SetPlayer", newAdmin);
+                await Clients.Group(userConnection.Room).SendAsync("UpdateRoom", currentRoom);
             }
         }
         public override Task OnDisconnectedAsync(Exception exception)
@@ -128,10 +131,10 @@ namespace Cards.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
         }
 
-        private async Task SendPlayersToClient(UserConnection userConnection, UserModel user, Room currentRoom)
+        private async Task SendPlayersToClient(UserModel user, RoomModel currentRoom)
         {
             await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", user);
-            await Clients.Group(userConnection.Room).SendAsync("UpdatePlayers", currentRoom.UserModels);
+            await Clients.Group(currentRoom.roomName).SendAsync("UpdateRoom", currentRoom);
         }
         private async Task SendRoomsToClients()
         {

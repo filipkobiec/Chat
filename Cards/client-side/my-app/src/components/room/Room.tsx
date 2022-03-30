@@ -6,8 +6,9 @@ import {useParams} from 'react-router-dom';
 import UserModel from "../../models/UserModel";
 import CardGame from "./CardGame"
 import WhiteCard from "../cards/WhiteCard";
+import RoomModel from "../../models/RoomModel";
 
-function Room({ messages, sendMessage, closeRoomConnection, players, player, startGame, sendCardPlayerChose} : {messages : Message[], sendMessage : any, closeRoomConnection : any, players: UserModel[], player: UserModel, startGame: any, sendCardPlayerChose: any}) {
+function Room({ room, messages, sendMessage, closeRoomConnection, player, startGame, sendCardPlayerChose} : {room : RoomModel, messages : Message[], sendMessage : any, closeRoomConnection : any, player: UserModel, startGame: any, sendCardPlayerChose: any}) {
     const history = useHistory();
     const { id } = useParams() as {id: string};
     return(
@@ -20,7 +21,7 @@ function Room({ messages, sendMessage, closeRoomConnection, players, player, sta
                 >Leave Room</Button>
             </div>
             <div>
-                {players.map((p, index) => {
+                {room.userModels.map((p, index) => {
                     if (p.isAdmin) {
                         return (
                             <div key={index}>
@@ -50,18 +51,21 @@ function Room({ messages, sendMessage, closeRoomConnection, players, player, sta
                 }
                 )}
             </div>
-            <div>
-                <Button variant='danger' onClick={() => {
-                    startGame(id, player);
-                }}
-                >Start Game</Button>
-            </div>
+            {player.isAdmin &&
+                <div>
+                    <Button variant='danger' onClick={() => {
+                        startGame(id, player);
+                    }}
+                    >Start Game</Button>
+                </div>
+            }
+  
             {player.cards.map((c, index) => {
                 return(
                     <WhiteCard player={player} card={c} sendCardPlayerChose={sendCardPlayerChose}  key={index}/>
                 )
             })}
-            <CardGame player={player} players={players}></CardGame>
+            <CardGame player={player} players={room.userModels}></CardGame>
             <Chat messages = {messages} sendMessage = {sendMessage}></Chat>
         </div>
     )

@@ -23,6 +23,7 @@ function App() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [players, setPlayers] = useState<UserModel[]>([]);
     const [player, setPlayer] = useState<UserModel>(new UserModel());
+    const [room, setRoom] = useState<RoomModel>(new RoomModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);
     
     useEffect(() => {
@@ -40,8 +41,8 @@ function App() {
                 setMessages(messages => [...messages, {user, message}]);
             });
 
-            connection.on("UpdatePlayers", (players: UserModel[]) => {
-                setPlayers(players)
+            connection.on("UpdateRoom", (room: RoomModel) => {
+                setRoom(room)
             })
 
             connection.on("ReceiveRooms", (rooms: RoomModel[]) => {
@@ -119,8 +120,8 @@ function App() {
                         <Lobby joinRoom={joinRoom}/>
                     </Route>
                     <Route path="/room/:id">
-                        <Room messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={CloseRoomConnection} players={players} player={player} startGame={StartGame} sendCardPlayerChose={sendCardPlayerChose}/>
+                        <Room room={room} messages={messages} sendMessage={sendMessage} 
+                        closeRoomConnection={CloseRoomConnection} player={player} startGame={StartGame} sendCardPlayerChose={sendCardPlayerChose}/>
                     </Route>
                 </Switch>
             </Router>

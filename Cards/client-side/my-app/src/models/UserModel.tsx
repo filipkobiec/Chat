@@ -6,6 +6,7 @@ export default class UserModel {
     public isAdmin: boolean = false;
     public points: number = 0;
     public isPlayerTurn: boolean = false;
+    public isPlayerCardChar: boolean = false;
     public cards: CardModel[] = [];
     public connectionId: string = '';
   }

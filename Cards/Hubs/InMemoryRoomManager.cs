@@ -8,36 +8,36 @@ namespace Cards.Hubs
 {
     public class InMemoryRoomManager : IRoomManager
     {
-        private readonly IDictionary<string, Room> _rooms;
+        private readonly IDictionary<string, RoomModel> _rooms;
 
         public InMemoryRoomManager()
         {
-            _rooms = new ConcurrentDictionary<string, Room>();
+            _rooms = new ConcurrentDictionary<string, RoomModel>();
         }
 
-        public Room AddUserToRoom(string roomName, UserModel user)
+        public RoomModel AddUserToRoom(string roomName, UserModel user)
         {
             var room = _rooms[roomName];
             room.UserModels.Add(user);
             return room;
         }
 
-        public Room CreateRoom(string roomName, UserModel admin)
+        public RoomModel CreateRoom(string roomName, UserModel admin)
         {
-            var newRoom = new Room(roomName, admin);
+            var newRoom = new RoomModel(roomName, admin);
             _rooms.Add(roomName, newRoom);
             return newRoom;
         }
 
-        public ICollection<Room> GetAllRooms() => _rooms.Values;
+        public ICollection<RoomModel> GetAllRooms() => _rooms.Values;
 
-        public Room GetRoom(string roomName) => _rooms[roomName];
+        public RoomModel GetRoom(string roomName) => _rooms[roomName];
 
         public bool IsRoomCreated(string roomName) => _rooms.ContainsKey(roomName);
 
         public bool RemoveRoom(string roomName) => _rooms.Remove(roomName);
 
-        public bool SaveRoom(Room room)
+        public bool SaveRoom(RoomModel room)
         {
             return true;
         }

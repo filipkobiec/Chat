@@ -86,7 +86,7 @@ function App() {
 
     const sendMessage = async (user: UserModel ,message : string) => {
       try {
-        await connection?.invoke("SendMessage", message);
+        await connection?.invoke("SendMessage", user, message);
       } catch (e) {
         console.log(e)
       }

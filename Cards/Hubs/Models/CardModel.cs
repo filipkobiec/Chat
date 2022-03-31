@@ -10,6 +10,7 @@ namespace Cards.Hubs.Models
     {
         public Guid Id { get; set; }
         public Guid OwnerId { get; set; }
+        public bool IsVisible { get; set; }
         public string Text { get; set; }
 
         [JsonConstructor]
@@ -21,12 +22,14 @@ namespace Cards.Hubs.Models
             Id = Guid.NewGuid();
             Text = text;
             OwnerId = ownerId;
+            IsVisible = true;
         }
 
         public CardModel(string text)
         {
             Id = Guid.NewGuid();
             Text = text;
+            IsVisible = true;
         }
 
     }

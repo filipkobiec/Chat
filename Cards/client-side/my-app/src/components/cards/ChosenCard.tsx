@@ -12,7 +12,9 @@ function chosenCard({player, card, handleWinnerCard} : {player: UserModel, card 
     }
     return(
         <Button className={liClasses.join(' ')} onClick={() => {handleWinnerCard(card, player.roomId)}}>
-            <h2>{card.text}</h2>
+              {card.isVisible &&
+                <h2>{card.text}</h2>
+              }
         </Button>
     )
 }

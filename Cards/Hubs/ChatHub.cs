@@ -95,11 +95,16 @@ namespace Cards.Hubs
             player.IsPlayerTurn = false;
             var playerRoom = _roomManager.GetRoom(player.RoomId);
             player.Cards.RemoveAll(c => c.Id == card.Id);
+            card.IsVisible = false;
             playerRoom.ChosenCards.Add(card);
             if (playerRoom.ChosenCards.Count == playerRoom.UserModels.Count - 1)
             {
                 var cardChar = playerRoom.CardChar;
                 cardChar.IsPlayerTurn = true;
+                foreach (var chosenCard in playerRoom.ChosenCards)
+                {
+                    chosenCard.IsVisible = true;
+                }
                 await Clients.Client(cardChar.ConnectionId).SendAsync("SetPlayer", cardChar);
             }
             await UpdateRoom(player, playerRoom);

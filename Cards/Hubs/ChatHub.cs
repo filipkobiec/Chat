@@ -111,6 +111,25 @@ namespace Cards.Hubs
             var players = room.UserModels;
             var player = players.FirstOrDefault(p => p.Id == card.OwnerId);
             player.Points++;
+
+            room.ChosenCards.Clear();
+            var oldCardChar = room.CardChar;
+            oldCardChar.IsPlayerCardChar = false;
+            var playerIndex = players.IndexOf(oldCardChar);
+            var nextCardChar = players[(playerIndex + 1) % players.Count];
+            nextCardChar.IsPlayerCardChar = true;
+            room.CardChar = nextCardChar;
+
+            foreach (var roomPlayer in players)
+            {
+                if (roomPlayer.IsPlayerCardChar)
+                    roomPlayer.IsPlayerTurn = false;
+                else
+                    roomPlayer.IsPlayerTurn = true;
+
+                await Clients.Client(roomPlayer.ConnectionId).SendAsync("SetPlayer", roomPlayer);
+            }
+
             await Clients.Group(room.Id.ToString()).SendAsync("UpdateRoom", room);
         }
 

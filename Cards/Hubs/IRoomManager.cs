@@ -8,11 +8,11 @@ namespace Cards.Hubs
     public interface IRoomManager
     {
         public RoomModel CreateRoom(string roomName, UserModel admin);
-        public RoomModel AddUserToRoom(string roomName, UserModel user);
-        public RoomModel GetRoom(string roomName);
-        public bool RemoveRoom(string roomName);
+        public RoomModel AddUserToRoom(Guid roomId, UserModel user);
+        public RoomModel GetRoom(Guid roomId);
+        public bool RemoveRoom(Guid roomId);
         public bool SaveRoom(RoomModel room);
-        public bool IsRoomCreated(string roomName);
+        public bool IsRoomCreated(Guid roomId);
         public ICollection<RoomModel> GetAllRooms();
     }
 }

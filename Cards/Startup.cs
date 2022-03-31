@@ -34,7 +34,7 @@ namespace Cards
                     .AllowCredentials();
                 });
             });
-            services.AddSingleton<IDictionary<string, UserConnection>>(opts => new ConcurrentDictionary<string, UserConnection>());
+            services.AddSingleton<IDictionary<string, UserModel>>(opts => new ConcurrentDictionary<string, UserModel>());
             services.AddSingleton<IRoomManager, InMemoryRoomManager>();
         }
 

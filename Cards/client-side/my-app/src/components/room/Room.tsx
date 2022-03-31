@@ -54,7 +54,7 @@ function Room({ room, messages, sendMessage, closeRoomConnection, player, startG
             {player.isAdmin &&
                 <div>
                     <Button variant='danger' onClick={() => {
-                        startGame(id, player);
+                        startGame(player);
                     }}
                     >Start Game</Button>
                 </div>
@@ -65,14 +65,20 @@ function Room({ room, messages, sendMessage, closeRoomConnection, player, startG
                     {room.blackCard.text}
                 </div>
             }
-            
+            <div>
+                {room.chosenCards.map((c, index) => {
+                    return(
+                        <WhiteCard player={player} card={c} sendCardPlayerChose={sendCardPlayerChose}  key={index}/>
+                    )
+                })}
+            </div>
             {player.cards.map((c, index) => {
                 return(
                     <WhiteCard player={player} card={c} sendCardPlayerChose={sendCardPlayerChose}  key={index}/>
                 )
             })}
             <CardGame player={player} players={room.userModels}></CardGame>
-            <Chat messages = {messages} sendMessage = {sendMessage}></Chat>
+            <Chat player={player} messages = {messages} sendMessage = {sendMessage}></Chat>
         </div>
     )
 }

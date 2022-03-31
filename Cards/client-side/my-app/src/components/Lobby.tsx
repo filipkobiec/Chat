@@ -3,7 +3,7 @@ import { Button, Form } from "react-bootstrap"
 import { useHistory } from "react-router-dom"
 import UserModel from "../models/UserModel";
 
-function Lobby({ joinRoom }: any) {
+function Lobby({ createRoom }: any) {
     const [user, setUser] = useState('');
     const [room, setRoom] = useState('');
     const history = useHistory();
@@ -13,7 +13,7 @@ function Lobby({ joinRoom }: any) {
                 e.preventDefault();
                 const userModel = new UserModel();
                 userModel.name = user;
-                joinRoom(userModel, room);
+                createRoom(userModel, room);
                 history.push(`room/${room}`)
             }}
         >

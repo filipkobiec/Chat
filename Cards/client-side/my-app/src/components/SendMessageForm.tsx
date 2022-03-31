@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { FormControl, InputGroup, Button, Form } from "react-bootstrap"
+import UserModel from "../models/UserModel";
 
-function SendMessageForm({ sendMessage } : {sendMessage : any}) {
+function SendMessageForm({player, sendMessage } : {player : UserModel, sendMessage : any}) {
     const [message, setMessage] = useState('');
     return (
         <Form
             onSubmit={e => {
                 e.preventDefault();
-                sendMessage(message);
+                sendMessage(player, message);
                 setMessage('');
             }}>
             <InputGroup>

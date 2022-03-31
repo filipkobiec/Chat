@@ -12,19 +12,7 @@ namespace Cards.Controllers
     [ApiController]
     public class HubsController : ControllerBase
     {
-        private readonly IDictionary<string, UserConnection> _connections;
-
-        public HubsController(IDictionary<string, UserConnection> connections)
-        {
-            this._connections = connections;
-        }
-
-        [HttpGet]
-        public HashSet<string> GetAllHubs()
-        {
-            HashSet<string> keyList = new HashSet<string>(_connections.Values.Select(connection => connection.Room));
-            return keyList;
-        }
+       
 
     }
 }

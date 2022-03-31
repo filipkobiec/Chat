@@ -8,8 +8,9 @@ namespace Cards.Hubs.Models
 {
     public class CardModel
     {
-        public string Text { get; set; }
+        public Guid Id { get; set; }
         public Guid OwnerId { get; set; }
+        public string Text { get; set; }
 
         [JsonConstructor]
         public CardModel()
@@ -17,12 +18,14 @@ namespace Cards.Hubs.Models
         }
         public CardModel(string text, Guid ownerId)
         {
+            Id = Guid.NewGuid();
             Text = text;
             OwnerId = ownerId;
         }
 
         public CardModel(string text)
         {
+            Id = Guid.NewGuid();
             Text = text;
         }
 

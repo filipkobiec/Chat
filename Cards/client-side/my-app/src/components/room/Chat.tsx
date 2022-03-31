@@ -1,13 +1,14 @@
 import MessageContainer from "../MessageContainer";
 import Message from "../../models/Message"
 import SendMessageForm from "../SendMessageForm"
+import UserModel from "../../models/UserModel";
 
-function Chat({ messages, sendMessage} : {messages : Message[], sendMessage : any}) {
+function Chat({player, messages, sendMessage} : {player : UserModel, messages : Message[], sendMessage : any}) {
     return(
         <div>
             <div className="chat">
                 <MessageContainer messages={messages}></MessageContainer>
-                <SendMessageForm sendMessage={sendMessage}/>
+                <SendMessageForm player={player} sendMessage={sendMessage}/>
             </div>
         </div>
     )

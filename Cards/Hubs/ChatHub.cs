@@ -1,6 +1,7 @@
 ﻿using Cards.Hubs.Models;
 using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,14 +10,14 @@ namespace Cards.Hubs
     public class ChatHub : Hub
     {
         private readonly string _botUser;
-        private readonly IDictionary<string, UserConnection> _connections;
         private readonly IRoomManager _roomManager;
         private readonly List<CardModel> _blackCards;
+        private readonly IDictionary<string, UserModel> _connections;
 
-        public ChatHub(IDictionary<string, UserConnection> _connections, IRoomManager roomManager)
+        public ChatHub(IRoomManager roomManager, IDictionary<string, UserModel> connections)
         {
+            _connections = connections;
             _botUser = "MyChat Bot";
-            this._connections = _connections;
             _roomManager = roomManager;
             _blackCards = new List<CardModel>();
             for (int i = 0; i < 10; i++)
@@ -24,32 +25,33 @@ namespace Cards.Hubs
                 _blackCards.Add(new CardModel(i.ToString()));
             }
         }
-        public async Task JoinRoom(UserConnection userConnection)
+        public async Task JoinRoom(UserModel player, Guid roomId)
         {
-            var roomName = userConnection.Room;
-            var user = userConnection.User;
-            user.Id = Guid.NewGuid();
-            user.ConnectionId = Context.ConnectionId;
-            await HandleJoiningRoomByClient(userConnection);
+            var room = _roomManager.GetRoom(roomId);
+            player.RoomId = room.Id;
+            player.Id = Guid.NewGuid();
+            player.ConnectionId = Context.ConnectionId;
+            await HandleJoiningRoomByClient(room, player);
+            _roomManager.AddUserToRoom(roomId, player);
+            await UpdateRoom(player, room);
+        }
 
-            RoomModel currentRoom;
-            if (_roomManager.IsRoomCreated(roomName))
-                currentRoom = _roomManager.AddUserToRoom(roomName, user);
-            else
-            {
-                currentRoom = _roomManager.CreateRoom(roomName, user);
-                await SendRoomsToClients();
-            }
-            await SendPlayersToClient(user, currentRoom);
+        public async Task CreateRoom(UserModel player, string roomName)
+        {
+            
+            player.Id = Guid.NewGuid();
+            player.ConnectionId = Context.ConnectionId;
+            var room = _roomManager.CreateRoom(roomName, player);
+            player.RoomId = room.Id;
+            await HandleJoiningRoomByClient(room, player);
+            await SendRoomsToClients();
+            await UpdateRoom(player, room);
 
         }
-        public async Task SendMessage(string message)
+        public async Task SendMessage(UserModel player, string message)
         {
-            if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
-            {
-                await Clients.Group(userConnection.Room)
-                    .SendAsync("ReceiveMessage", userConnection.User.Name, message);
-            }
+            await Clients.Group(player.RoomId.ToString())
+                .SendAsync("ReceiveMessage", player.Name, message);
         }
 
         public async Task GetRooms()
@@ -58,11 +60,12 @@ namespace Cards.Hubs
             await SendRoomsToClients();
         }
 
-        public async Task StartGame(string roomName, UserModel clientPlayer)
+        public async Task StartGame(UserModel clientPlayer)
         {
-            var currentRoom = _roomManager.GetRoom(roomName);
+            var currentRoom = _roomManager.GetRoom(clientPlayer.RoomId);
             currentRoom.BlackCards = _blackCards;
             currentRoom.BlackCard = currentRoom.BlackCards[0];
+            currentRoom.ChosenCards = new List<CardModel>();
             var players = currentRoom.UserModels;
 
             foreach (var player in players)
@@ -82,73 +85,84 @@ namespace Cards.Hubs
                 }
                 await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);
             }
-            await Clients.Group(roomName).SendAsync("UpdateRoom", currentRoom);
+            await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
         }
 
         public async Task GetChosenCard(UserModel player, CardModel card)
         {
             player.IsPlayerTurn = false;
-            await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);
+            var playerRoom = _roomManager.GetRoom(player.RoomId);
+            player.Cards.RemoveAll(c => c.Id == card.Id);
+            playerRoom.ChosenCards.Add(card);
+            await UpdateRoom(player, playerRoom);
         }
 
         public async Task CloseRoomConnection()
         {
-            var userConnection = _connections[Context.ConnectionId];
-            var currentRoom = _roomManager.GetRoom(userConnection.Room);
-            currentRoom.UserModels.Remove(userConnection.User);
-            _connections.Remove(Context.ConnectionId);
-            await Groups.AddToGroupAsync(Context.ConnectionId, "Lobby");
+            if (_connections.TryGetValue(Context.ConnectionId, out UserModel player))
+            {
+                var currentRoom = _roomManager.GetRoom(player.RoomId);
+                currentRoom.UserModels.Remove(player);
+                _connections.Remove(Context.ConnectionId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, "Lobby");
 
-            if (currentRoom.IsRoomEmpty)
-            {
-                _roomManager.RemoveRoom(currentRoom.roomName);
-                await SendRoomsToClients();
+                if (currentRoom.IsRoomEmpty)
+                {
+                    _roomManager.RemoveRoom(currentRoom.Id);
+                    await SendRoomsToClients();
+                }
+                else
+                {
+                    var newAdmin = currentRoom.UserModels[0];
+                    newAdmin.IsAdmin = true;
+                    _roomManager.SaveRoom(currentRoom);
+                    await Clients.Group(currentRoom.Id.ToString())
+                       .SendAsync("ReceiveMessage", _botUser, $"{player.Name} has left");
+                    await SendRoomsToClients();
+                    await Clients.Client(newAdmin.ConnectionId).SendAsync("SetPlayer", newAdmin);
+                    await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
+                }
             }
-            else
-            {
-                var newAdmin = currentRoom.UserModels[0];
-                newAdmin.IsAdmin = true;
-                _roomManager.SaveRoom(currentRoom);
-                await Clients.Group(userConnection.Room)
-                   .SendAsync("ReceiveMessage", _botUser, $"{userConnection.User.Name} has left");
-                await SendRoomsToClients();
-                await Clients.Client(newAdmin.ConnectionId).SendAsync("SetPlayer", newAdmin);
-                await Clients.Group(userConnection.Room).SendAsync("UpdateRoom", currentRoom);
-            }
+
         }
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if(_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+            if (_connections.TryGetValue(Context.ConnectionId, out UserModel player))
             {
+                var currentRoom = _roomManager.GetRoom(player.RoomId);
+                currentRoom.UserModels.Remove(player);
                 _connections.Remove(Context.ConnectionId);
-                var currentRoom = _roomManager.GetRoom(userConnection.Room);
-                currentRoom.UserModels.Remove(userConnection.User);
+
                 if (currentRoom.UserModels.Count == 0)
                 {
-                    _roomManager.RemoveRoom(currentRoom.roomName);
+                    _roomManager.RemoveRoom(currentRoom.Id);
                     Clients.Group("Lobby")
                     .SendAsync("ReceiveRooms", _roomManager.GetAllRooms());
                 }
-                Clients.Group(userConnection.Room)
-                    .SendAsync("ReceiveMessage", _botUser, $"{userConnection.User.Name} has left");
-                Clients.Group(userConnection.Room)
-                    .SendAsync("UpdatePlayers", currentRoom.UserModels);
+                else
+                {
+                    Clients.Group(currentRoom.Id.ToString())
+                        .SendAsync("ReceiveMessage", _botUser, $"{player.Name} has left");
+                    Clients.Group(currentRoom.Id.ToString())
+                        .SendAsync("UpdateRoom", currentRoom);
+                }
             }
+
             return base.OnDisconnectedAsync(exception);
         }
-        private async Task HandleJoiningRoomByClient(UserConnection userConnection)
+        private async Task HandleJoiningRoomByClient(RoomModel room, UserModel player)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
-            _connections[Context.ConnectionId] = userConnection;
-            await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser,
-                $"{userConnection.User.Name} has joined {userConnection.Room}");
+            _connections[Context.ConnectionId] = player;
+            await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
+            await Clients.Group(room.Id.ToString()).SendAsync("ReceiveMessage", _botUser,
+                $"{player.Name} has joined {room.roomName}");
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
         }
 
-        private async Task SendPlayersToClient(UserModel user, RoomModel currentRoom)
+        private async Task UpdateRoom(UserModel user, RoomModel currentRoom)
         {
             await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", user);
-            await Clients.Group(currentRoom.roomName).SendAsync("UpdateRoom", currentRoom);
+            await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
         }
         private async Task SendRoomsToClients()
         {

@@ -21,7 +21,6 @@ import CardModel from "./models/CardModel";
 function App() {
     const [connection, setConnection] = useState<signalR.HubConnection>();
     const [messages, setMessages] = useState<Message[]>([]);
-    const [players, setPlayers] = useState<UserModel[]>([]);
     const [player, setPlayer] = useState<UserModel>(new UserModel());
     const [room, setRoom] = useState<RoomModel>(new RoomModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);
@@ -66,16 +65,26 @@ function App() {
             console.log(e);
         }
     }
-    const joinRoom = async (user: UserModel, room : string) => {
+
+    const createRoom = async (user: UserModel, roomName: string) => {
         setMessages([])
         try {
-            await connection?.invoke("JoinRoom", { user, room })
+            await connection?.invoke("CreateRoom",  user, roomName )
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    
+    const joinRoom = async (user: UserModel, roomId : string) => {
+        setMessages([])
+        try {
+            await connection?.invoke("JoinRoom",  user, roomId )
         } catch (e) {
             console.log(e);
         }
     }
 
-    const sendMessage = async (message : string) => {
+    const sendMessage = async (user: UserModel ,message : string) => {
       try {
         await connection?.invoke("SendMessage", message);
       } catch (e) {
@@ -83,7 +92,7 @@ function App() {
       }
     };
 
-    const sendCardPlayerChose = async (player: UserModel, userCard: CardModel) => {
+    const sendCardPlayerChose = async (player : UserModel, userCard: CardModel) => {
         try {
             await connection?.invoke("GetChosenCard",  player, userCard )
         } catch (e) {
@@ -100,9 +109,9 @@ function App() {
     }
 
     
-    const StartGame = async (room: string, player: UserModel) => {
+    const StartGame = async (player: UserModel) => {
         try {
-            await connection?.invoke("StartGame", room, player);
+            await connection?.invoke("StartGame", player);
         } catch (e) {
             console.log(e)
         }
@@ -117,7 +126,7 @@ function App() {
                 <Switch>
                     <Route exact path="/">
                         <RoomsHub joinRoom={joinRoom} rooms={rooms}/>
-                        <Lobby joinRoom={joinRoom}/>
+                        <Lobby createRoom={createRoom}/>
                     </Route>
                     <Route path="/room/:id">
                         <Room room={room} messages={messages} sendMessage={sendMessage} 

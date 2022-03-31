@@ -100,6 +100,14 @@ function App() {
         }
     }
 
+    const handleWinnerCard = async ( userCard: CardModel, roomId: string) => {
+        try {
+            await connection?.invoke("handleWinnerCard",  userCard, roomId )
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     const CloseRoomConnection = async () => {
         try {
             await connection?.invoke("CloseRoomConnection");
@@ -130,7 +138,7 @@ function App() {
                     </Route>
                     <Route path="/room/:id">
                         <Room room={room} messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={CloseRoomConnection} player={player} startGame={StartGame} sendCardPlayerChose={sendCardPlayerChose}/>
+                        closeRoomConnection={CloseRoomConnection} player={player} startGame={StartGame} sendCardPlayerChose={sendCardPlayerChose} handleWinnerCard={handleWinnerCard}/>
                     </Route>
                 </Switch>
             </Router>

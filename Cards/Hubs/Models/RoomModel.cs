@@ -10,6 +10,7 @@ namespace Cards.Hubs
     {
         public Guid Id { get; set; }
         public UserModel Admin { get; set; }
+        public UserModel CardChar { get; set; }
         public bool IsRoomEmpty => UserModels.Count == 0;
         public List<UserModel> UserModels { get; set; }
         public string roomName { get; }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Cards.Hubs
@@ -72,6 +73,7 @@ namespace Cards.Hubs
             {
                 if (player.IsAdmin)
                 {
+                    currentRoom.CardChar = player;
                     player.IsPlayerCardChar = true;
                     player.IsPlayerTurn = false;
                 }
@@ -94,7 +96,22 @@ namespace Cards.Hubs
             var playerRoom = _roomManager.GetRoom(player.RoomId);
             player.Cards.RemoveAll(c => c.Id == card.Id);
             playerRoom.ChosenCards.Add(card);
+            if (playerRoom.ChosenCards.Count == playerRoom.UserModels.Count - 1)
+            {
+                var cardChar = playerRoom.CardChar;
+                cardChar.IsPlayerTurn = true;
+                await Clients.Client(cardChar.ConnectionId).SendAsync("SetPlayer", cardChar);
+            }
             await UpdateRoom(player, playerRoom);
+        }
+
+        public async Task HandleWinnerCard(CardModel card, string roomId)
+        {
+            var room = _roomManager.GetRoom(Guid.Parse(roomId));
+            var players = room.UserModels;
+            var player = players.FirstOrDefault(p => p.Id == card.OwnerId);
+            player.Points++;
+            await Clients.Group(room.Id.ToString()).SendAsync("UpdateRoom", room);
         }
 
         public async Task CloseRoomConnection()

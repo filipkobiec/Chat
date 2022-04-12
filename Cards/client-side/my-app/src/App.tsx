@@ -14,7 +14,6 @@ import {
     Route,
     Switch,
 } from "react-router-dom";
-import CardModel from "./models/CardModel";
 
 
 
@@ -92,34 +91,10 @@ function App() {
       }
     };
 
-    const sendCardPlayerChose = async (player : UserModel, userCard: CardModel) => {
-        try {
-            await connection?.invoke("GetChosenCard",  player, userCard )
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    const handleWinnerCard = async ( userCard: CardModel, roomId: string) => {
-        try {
-            await connection?.invoke("handleWinnerCard",  userCard, roomId )
-        } catch (e) {
-            console.log(e);
-        }
-    }
 
     const CloseRoomConnection = async () => {
         try {
             await connection?.invoke("CloseRoomConnection");
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    
-    const StartGame = async (player: UserModel) => {
-        try {
-            await connection?.invoke("StartGame", player);
         } catch (e) {
             console.log(e)
         }
@@ -138,7 +113,7 @@ function App() {
                     </Route>
                     <Route path="/room/:id">
                         <Room room={room} messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={CloseRoomConnection} player={player} startGame={StartGame} sendCardPlayerChose={sendCardPlayerChose} handleWinnerCard={handleWinnerCard}/>
+                        closeRoomConnection={CloseRoomConnection} player={player} />
                     </Route>
                 </Switch>
             </Router>

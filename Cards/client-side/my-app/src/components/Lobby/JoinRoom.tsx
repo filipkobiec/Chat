@@ -21,7 +21,6 @@ function JoinRoom({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
                 history.push(`room/${roomName}`)
             }}
         >
-            
             <Form.Control placeholder="name" onChange={e => setUser(e.target.value)} />
             {
                 rooms.map((element, index) => 

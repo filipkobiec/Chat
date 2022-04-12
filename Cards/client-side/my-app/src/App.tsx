@@ -110,7 +110,9 @@ function App() {
             <Router>
                 <Switch>
                     <Route exact path="/">
+                        {rooms.length != 0 &&
                         <JoinRoom joinRoom={joinRoom} rooms={rooms}/>
+                        }
                         <RoomCreation createRoom={createRoom} user={player}/>
                     </Route>
                     <Route path="/room/:id">

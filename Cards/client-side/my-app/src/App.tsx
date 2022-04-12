@@ -105,15 +105,15 @@ function App() {
 
     return (
         <div className="app">
-            <h2>MyChat</h2>
+            <h2>Chat</h2>
             <hr className="line" />
             <Router>
                 <Switch>
                     <Route exact path="/">
+                        <RoomCreation createRoom={createRoom} user={player}/>
                         {rooms.length != 0 &&
                         <JoinRoom joinRoom={joinRoom} rooms={rooms}/>
                         }
-                        <RoomCreation createRoom={createRoom} user={player}/>
                     </Route>
                     <Route path="/room/:id">
                         <Room room={room} messages={messages} sendMessage={sendMessage} 

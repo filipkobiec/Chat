@@ -63,27 +63,16 @@ namespace Cards.Hubs
                 var currentRoom = _roomManager.GetRoom(player.RoomId);
                 currentRoom.UserModels.Remove(player);
                 _connections.Remove(Context.ConnectionId);
-                await Groups.AddToGroupAsync(Context.ConnectionId, "Lobby");
+                await Groups.AddToGroupAsync(player.ConnectionId, "Lobby");
 
                 if (currentRoom.IsRoomEmpty)
-                {
-                    _roomManager.RemoveRoom(currentRoom.Id);
-                    await SendRoomsToClients();
-                }
+                    await RemoveRoom(currentRoom);
                 else
-                {
-                    var newAdmin = currentRoom.UserModels[0];
-                    newAdmin.IsAdmin = true;
-                    _roomManager.SaveRoom(currentRoom);
-                    await Clients.Group(currentRoom.Id.ToString())
-                       .SendAsync("ReceiveMessage", _botUser, $"{player.Name} has left");
-                    await SendRoomsToClients();
-                    await Clients.Client(newAdmin.ConnectionId).SendAsync("SetPlayer", newAdmin);
-                    await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
-                }
+                    await HandlePlayerLeavingRoom(player, currentRoom);
             }
 
         }
+
         public override Task OnDisconnectedAsync(Exception exception)
         {
             if (_connections.TryGetValue(Context.ConnectionId, out UserModel player))
@@ -109,24 +98,45 @@ namespace Cards.Hubs
 
             return base.OnDisconnectedAsync(exception);
         }
-        private async Task HandleJoiningRoomByClient(RoomModel room, UserModel player)
-        {
-            _connections[Context.ConnectionId] = player;
-            await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
-            await Clients.Group(room.Id.ToString()).SendAsync("ReceiveMessage", _botUser,
-                $"{player.Name} has joined {room.roomName}");
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
-        }
 
         private async Task UpdateRoom(UserModel user, RoomModel currentRoom)
         {
-            await Clients.Client(Context.ConnectionId).SendAsync("SetPlayer", user);
             await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
         }
+
         private async Task SendRoomsToClients()
         {
             await Clients.Group("Lobby")
                 .SendAsync("ReceiveRooms", _roomManager.GetAllRooms());
         }
+
+        private async Task HandleJoiningRoomByClient(RoomModel room, UserModel player)
+        {
+            _connections[Context.ConnectionId] = player;
+            await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
+            await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);   
+            await Clients.Group(room.Id.ToString()).SendAsync("ReceiveMessage", _botUser,
+                $"{player.Name} has joined {room.roomName}");
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
+        }
+
+        private async Task HandlePlayerLeavingRoom(UserModel player, RoomModel currentRoom)
+        {
+            var newAdmin = currentRoom.UserModels[0];
+            newAdmin.IsAdmin = true;
+            _roomManager.SaveRoom(currentRoom);
+            await Clients.Group(currentRoom.Id.ToString())
+               .SendAsync("ReceiveMessage", _botUser, $"{player.Name} has left");
+            await SendRoomsToClients();
+            await Clients.Client(newAdmin.ConnectionId).SendAsync("SetPlayer", newAdmin);
+            await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
+        }
+
+        private async Task RemoveRoom(RoomModel currentRoom)
+        {
+            _roomManager.RemoveRoom(currentRoom.Id);
+            await SendRoomsToClients();
+        }
+
     }
 }

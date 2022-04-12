@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 import './scss/App.scss';
 import * as signalR from "@microsoft/signalr"
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Lobby from "./components/Lobby";
+import RoomCreation from "./components/Lobby/RoomCreation";
 import Room from "./components/room/Room";
 import { LogLevel } from "@microsoft/signalr";
 import Message from "./models/Message";
 import UserModel from "./models/UserModel";
 import RoomModel from "./models/RoomModel"
-import RoomsHub from "./components/RoomsHub"
+import JoinRoom from "./components/Lobby/JoinRoom"
 import {
     BrowserRouter as Router,
     Route,
     Switch,
+    useHistory,
 } from "react-router-dom";
 
 
@@ -23,6 +24,7 @@ function App() {
     const [player, setPlayer] = useState<UserModel>(new UserModel());
     const [room, setRoom] = useState<RoomModel>(new RoomModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);
+    const history = useHistory();
     
     useEffect(() => {
         makeConnection();
@@ -92,7 +94,7 @@ function App() {
     };
 
 
-    const CloseRoomConnection = async () => {
+    const closeRoomConnection = async () => {
         try {
             await connection?.invoke("CloseRoomConnection");
         } catch (e) {
@@ -108,12 +110,12 @@ function App() {
             <Router>
                 <Switch>
                     <Route exact path="/">
-                        <RoomsHub joinRoom={joinRoom} rooms={rooms}/>
-                        <Lobby createRoom={createRoom}/>
+                        <JoinRoom joinRoom={joinRoom} rooms={rooms}/>
+                        <RoomCreation createRoom={createRoom} user={player}/>
                     </Route>
                     <Route path="/room/:id">
                         <Room room={room} messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={CloseRoomConnection} player={player} />
+                        closeRoomConnection={closeRoomConnection} player={player} />
                     </Route>
                 </Switch>
             </Router>

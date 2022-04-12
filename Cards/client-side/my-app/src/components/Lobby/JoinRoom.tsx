@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap"
 import { useHistory } from "react-router-dom"
-import UserModel from "../models/UserModel";
-import RoomModel from "../models/RoomModel";
+import UserModel from "../../models/UserModel";
+import RoomModel from "../../models/RoomModel";
 
-function RoomsHub({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
+function JoinRoom({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
     
     const [user, setUser] = useState('');
     const history = useHistory();
@@ -35,4 +35,4 @@ function RoomsHub({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
     );
 }
 
-export default RoomsHub;
+export default JoinRoom;

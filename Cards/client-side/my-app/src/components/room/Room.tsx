@@ -5,10 +5,10 @@ import {useHistory} from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
 
-function Room({ room, messages, sendMessage, closeRoomConnection, player} : {room : RoomModel, messages : Message[], sendMessage : any, closeRoomConnection : any, player: UserModel}) {
+function Room({ room, messages, sendMessage, closeRoomConnection, user} : {room : RoomModel, messages : Message[], sendMessage : any, closeRoomConnection : any, user: UserModel}) {
     const history = useHistory();
 
-    if (room.userModels.length == 0){
+    if (room.userModels.length === 0){
         return(
             <div>
                 disconnected
@@ -54,7 +54,7 @@ function Room({ room, messages, sendMessage, closeRoomConnection, player} : {roo
                     }
                     )}
                 </div>
-                <Chat player={player} messages = {messages} sendMessage = {sendMessage}></Chat>
+                <Chat user={user} messages = {messages} sendMessage = {sendMessage}></Chat>
             </div>
         )
     }

@@ -1,6 +1,7 @@
 import Message from "../models/Message"
+import UserModel from "../models/UserModel";
 
-function MessageContainer({ messages } : {messages:Message[]}){
+function MessageContainer({ user, messages } : {user: UserModel, messages:Message[]}){
     return (
         <div className="message-container">
             {messages.map((m, index) => 

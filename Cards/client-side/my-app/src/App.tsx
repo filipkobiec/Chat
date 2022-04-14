@@ -13,7 +13,6 @@ import {
     BrowserRouter as Router,
     Route,
     Switch,
-    useHistory,
 } from "react-router-dom";
 
 
@@ -21,10 +20,9 @@ import {
 function App() {
     const [connection, setConnection] = useState<signalR.HubConnection>();
     const [messages, setMessages] = useState<Message[]>([]);
-    const [player, setPlayer] = useState<UserModel>(new UserModel());
+    const [user, setUser] = useState<UserModel>(new UserModel());
     const [room, setRoom] = useState<RoomModel>(new RoomModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);
-    const history = useHistory();
     
     useEffect(() => {
         makeConnection();
@@ -49,8 +47,8 @@ function App() {
                 setRooms(rooms);
             })
 
-            connection.on("SetPlayer", (user: UserModel) => {
-                setPlayer(user);
+            connection.on("SetUser", (user: UserModel) => {
+                setUser(user);
             })
 
             connection.onclose(e => {
@@ -110,14 +108,14 @@ function App() {
             <Router>
                 <Switch>
                     <Route exact path="/">
-                        <RoomCreation createRoom={createRoom} user={player}/>
-                        {rooms.length != 0 &&
+                        <RoomCreation createRoom={createRoom} user={user}/>
+                        {rooms.length !== 0 &&
                         <JoinRoom joinRoom={joinRoom} rooms={rooms}/>
                         }
                     </Route>
                     <Route path="/room/:id">
                         <Room room={room} messages={messages} sendMessage={sendMessage} 
-                        closeRoomConnection={closeRoomConnection} player={player} />
+                        closeRoomConnection={closeRoomConnection} user={user} />
                     </Route>
                 </Switch>
             </Router>

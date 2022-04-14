@@ -20,33 +20,33 @@ namespace Cards.Hubs
             _roomManager = roomManager;
   
         }
-        public async Task JoinRoom(UserModel player, Guid roomId)
+        public async Task JoinRoom(UserModel user, Guid roomId)
         {
             var room = _roomManager.GetRoom(roomId);
-            player.RoomId = room.Id;
-            player.Id = Guid.NewGuid();
-            player.ConnectionId = Context.ConnectionId;
-            await HandleJoiningRoomByClient(room, player);
-            _roomManager.AddUserToRoom(roomId, player);
-            await UpdateRoom(player, room);
+            user.RoomId = room.Id;
+            user.Id = Guid.NewGuid();
+            user.ConnectionId = Context.ConnectionId;
+            await HandleJoiningRoomByClient(room, user);
+            _roomManager.AddUserToRoom(roomId, user);
+            await UpdateRoom(user, room);
         }
 
-        public async Task CreateRoom(UserModel player, string roomName)
+        public async Task CreateRoom(UserModel user, string roomName)
         {
             
-            player.Id = Guid.NewGuid();
-            player.ConnectionId = Context.ConnectionId;
-            var room = _roomManager.CreateRoom(roomName, player);
-            player.RoomId = room.Id;
-            await HandleJoiningRoomByClient(room, player);
+            user.Id = Guid.NewGuid();
+            user.ConnectionId = Context.ConnectionId;
+            var room = _roomManager.CreateRoom(roomName, user);
+            user.RoomId = room.Id;
+            await HandleJoiningRoomByClient(room, user);
             await SendRoomsToClients();
-            await UpdateRoom(player, room);
+            await UpdateRoom(user, room);
 
         }
-        public async Task SendMessage(UserModel player, string message)
+        public async Task SendMessage(UserModel user, string message)
         {   
-            await Clients.Group(player.RoomId.ToString())
-                .SendAsync("ReceiveMessage", player.Name, message);
+            await Clients.Group(user.RoomId.ToString())
+                .SendAsync("ReceiveMessage", user.Name, message);
         }
 
         public async Task GetRooms()
@@ -58,27 +58,27 @@ namespace Cards.Hubs
 
         public async Task CloseRoomConnection()
         {
-            if (_connections.TryGetValue(Context.ConnectionId, out UserModel player))
+            if (_connections.TryGetValue(Context.ConnectionId, out UserModel user))
             {
-                var currentRoom = _roomManager.GetRoom(player.RoomId);
-                currentRoom.UserModels.Remove(player);
+                var currentRoom = _roomManager.GetRoom(user.RoomId);
+                currentRoom.UserModels.Remove(user);
                 _connections.Remove(Context.ConnectionId);
-                await Groups.AddToGroupAsync(player.ConnectionId, "Lobby");
+                await Groups.AddToGroupAsync(user.ConnectionId, "Lobby");
 
                 if (currentRoom.IsRoomEmpty)
                     await RemoveRoom(currentRoom);
                 else
-                    await HandlePlayerLeavingRoom(player, currentRoom);
+                    await HandleUserLeavingRoom(user, currentRoom);
             }
 
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if (_connections.TryGetValue(Context.ConnectionId, out UserModel player))
+            if (_connections.TryGetValue(Context.ConnectionId, out UserModel user))
             {
-                var currentRoom = _roomManager.GetRoom(player.RoomId);
-                currentRoom.UserModels.Remove(player);
+                var currentRoom = _roomManager.GetRoom(user.RoomId);
+                currentRoom.UserModels.Remove(user);
                 _connections.Remove(Context.ConnectionId);
 
                 if (currentRoom.UserModels.Count == 0)
@@ -90,7 +90,7 @@ namespace Cards.Hubs
                 else
                 {
                     Clients.Group(currentRoom.Id.ToString())
-                        .SendAsync("ReceiveMessage", _botUser, $"{player.Name} has left");
+                        .SendAsync("ReceiveMessage", _botUser, $"{user.Name} has left");
                     Clients.Group(currentRoom.Id.ToString())
                         .SendAsync("UpdateRoom", currentRoom);
                 }
@@ -110,25 +110,25 @@ namespace Cards.Hubs
                 .SendAsync("ReceiveRooms", _roomManager.GetAllRooms());
         }
 
-        private async Task HandleJoiningRoomByClient(RoomModel room, UserModel player)
+        private async Task HandleJoiningRoomByClient(RoomModel room, UserModel user)
         {
-            _connections[Context.ConnectionId] = player;
+            _connections[Context.ConnectionId] = user;
             await Groups.AddToGroupAsync(Context.ConnectionId, room.Id.ToString());
-            await Clients.Client(player.ConnectionId).SendAsync("SetPlayer", player);   
+            await Clients.Client(user.ConnectionId).SendAsync("SetUser", user);   
             await Clients.Group(room.Id.ToString()).SendAsync("ReceiveMessage", _botUser,
-                $"{player.Name} has joined {room.roomName}");
+                $"{user.Name} has joined {room.roomName}");
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "Lobby");
         }
 
-        private async Task HandlePlayerLeavingRoom(UserModel player, RoomModel currentRoom)
+        private async Task HandleUserLeavingRoom(UserModel user, RoomModel currentRoom)
         {
             var newAdmin = currentRoom.UserModels[0];
             newAdmin.IsAdmin = true;
             _roomManager.SaveRoom(currentRoom);
             await Clients.Group(currentRoom.Id.ToString())
-               .SendAsync("ReceiveMessage", _botUser, $"{player.Name} has left");
+               .SendAsync("ReceiveMessage", _botUser, $"{user.Name} has left");
             await SendRoomsToClients();
-            await Clients.Client(newAdmin.ConnectionId).SendAsync("SetPlayer", newAdmin);
+            await Clients.Client(newAdmin.ConnectionId).SendAsync("SetUser", newAdmin);
             await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
         }
 

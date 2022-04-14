@@ -3,6 +3,7 @@ import { Button, Form } from "react-bootstrap"
 import { useHistory } from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
+import styles from './JoinRoom.module.scss'; 
 
 function JoinRoom({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
     
@@ -11,7 +12,7 @@ function JoinRoom({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
     let roomName : string;
     let roomId  : string;
     return (
-        <div>
+        <div className={styles.joinRoom}>
             <h2>Join Room</h2>
             <Form className="hubs-container"
                 onSubmit={e => {

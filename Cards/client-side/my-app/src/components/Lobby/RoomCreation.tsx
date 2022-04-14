@@ -2,14 +2,15 @@ import { useState } from "react";
 import { Button, Form } from "react-bootstrap"
 import { useHistory } from "react-router-dom"
 import UserModel from "../../models/UserModel";
+import styles from './RoomCreation.module.scss'; 
 
 function RoomCreation({ createRoom, user}: {createRoom : any, user : UserModel}) {
     const [room, setRoom] = useState('');
     const history = useHistory();
     return (
-         <div>
+         <div className={styles.roomCreation}>
             <h2>Create Room</h2>
-            <Form className="lobby"
+            <Form 
                 onSubmit={e => {
                     e.preventDefault();
                     createRoom(user, room);

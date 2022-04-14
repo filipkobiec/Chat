@@ -44,7 +44,7 @@ namespace Cards.Hubs
 
         }
         public async Task SendMessage(UserModel player, string message)
-        {
+        {   
             await Clients.Group(player.RoomId.ToString())
                 .SendAsync("ReceiveMessage", player.Name, message);
         }

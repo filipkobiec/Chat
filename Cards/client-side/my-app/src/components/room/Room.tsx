@@ -2,10 +2,8 @@ import Chat from "./Chat";
 import Message from "../../models/Message"
 import {Button} from "react-bootstrap"
 import {useHistory} from "react-router-dom"
-import {useParams} from 'react-router-dom';
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
-import { useEffect } from "react";
 
 function Room({ room, messages, sendMessage, closeRoomConnection, player} : {room : RoomModel, messages : Message[], sendMessage : any, closeRoomConnection : any, player: UserModel}) {
     const history = useHistory();

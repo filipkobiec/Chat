@@ -14,6 +14,7 @@ import {
     Route,
     Switch,
 } from "react-router-dom";
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 
 
 
@@ -23,6 +24,7 @@ function App() {
     const [user, setUser] = useState<UserModel>(new UserModel());
     const [room, setRoom] = useState<RoomModel>(new RoomModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     
     useEffect(() => {
         makeConnection();
@@ -58,6 +60,7 @@ function App() {
 
             await connection.start();
             await connection.invoke("GetRooms")
+            setIsLoading(false);
             setConnection(connection);
         }
         catch (e) {
@@ -103,6 +106,7 @@ function App() {
 
     return (
         <div className="app">
+            {isLoading && <LoadingSpinner />}
             <h2>Chat</h2>
             <hr className="line" />
             <Router>

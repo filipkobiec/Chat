@@ -1,8 +1,9 @@
 .chatBox{
     max-width: 1200px;
     background-color: white;
-    min-height: 400px;
+    height: 400px;
     display: flex;
     flex-direction: column;
     padding: 10px;
+    overflow-y: scroll;
 }

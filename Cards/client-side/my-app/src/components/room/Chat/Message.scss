@@ -11,7 +11,7 @@
 
 .message-text{
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 15px;
     background-color: aliceblue;
 }
 
@@ -21,6 +21,12 @@
     margin-bottom: 2px;
 }
 
+.bot-message-text{
+    background-color: black;
+    color: white;
+}
+
 .from-user{
-    text-align: right;
+    text-align: left;
+    padding-left: 10px;
 }

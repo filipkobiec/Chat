@@ -37,9 +37,5 @@ namespace Cards.Hubs
 
         public bool RemoveRoom(Guid roomId) => _rooms.Remove(roomId);
 
-        public bool SaveRoom(RoomModel room)
-        {
-            return true;
-        }
     }
 }

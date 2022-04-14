@@ -15,6 +15,7 @@ import {
     Switch,
 } from "react-router-dom";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import NoServerConnection from "./components/Errors/NoServerConnection";
 
 
 
@@ -25,6 +26,7 @@ function App() {
     const [room, setRoom] = useState<RoomModel>(new RoomModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isErrorWithConnection, setIsErrorWithConnection] = useState(false);
     
     useEffect(() => {
         makeConnection();
@@ -56,6 +58,7 @@ function App() {
             connection.onclose(e => {
                 setConnection(undefined);
                 setMessages([]);
+                setIsErrorWithConnection(true);
             })
 
             await connection.start();
@@ -64,7 +67,10 @@ function App() {
             setConnection(connection);
         }
         catch (e) {
-            console.log(e);
+            if (e instanceof TypeError) {
+                setIsLoading(false);
+                setIsErrorWithConnection(true);
+            }
         }
     }
 
@@ -107,6 +113,7 @@ function App() {
     return (
         <div className="app">
             {isLoading && <LoadingSpinner />}
+            {isErrorWithConnection && <NoServerConnection />}
             <h2>Chat</h2>
             <hr className="line" />
             <Router>

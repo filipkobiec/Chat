@@ -12,7 +12,7 @@ h6 {
 
 hr.line {
   border: 1px solid #313131;
-  margin: 20px;
+  width: 100%;
 }
 
 .app {
@@ -20,15 +20,6 @@ hr.line {
   max-width: 1200px;
   padding-top: 40px;
   text-align: center;
-}
-
-.lobby {
-  max-width: 400px;
-  margin: auto;
-}
-
-.chat {
-  display: grid;
 }
 
 .leave-room {
@@ -43,30 +34,6 @@ hr.line {
   width: 200px;
   height: 440px;
   margin-right: 4px;
-}
-
-.message-container {
-  height: 400px;    
-  background-color: white;
-  overflow: auto;
-  border-radius: 5px;
-  margin-bottom: 2px;
-}
-
-.user-message {
-  text-align: right;
-  padding-right: 5px;
-  font-size: 18px;
-}
-
-.message {
-  display: inline-flex;
-  margin: 0px auto 0px auto;
-  padding: 5px;
-  font-size: 18px;
-  color:white;
-  border-radius: 20px;
-  margin-top: 3px;
 }
 
 .from-user {

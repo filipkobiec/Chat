@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import RoomCreation from "./components/Lobby/RoomCreation";
 import Room from "./components/room/Room";
 import { LogLevel } from "@microsoft/signalr";
-import Message from "./models/Message";
+import MessageModel from "./models/Message";
 import UserModel from "./models/UserModel";
 import RoomModel from "./models/RoomModel"
 import JoinRoom from "./components/Lobby/JoinRoom"
@@ -19,7 +19,7 @@ import {
 
 function App() {
     const [connection, setConnection] = useState<signalR.HubConnection>();
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<MessageModel[]>([]);
     const [user, setUser] = useState<UserModel>(new UserModel());
     const [room, setRoom] = useState<RoomModel>(new RoomModel());
     const [rooms, setRooms] = useState<RoomModel[]>([]);

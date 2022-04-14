@@ -1,11 +1,11 @@
-import Chat from "./Chat";
-import Message from "../../models/Message"
+import Chat from "./Chat/Chat";
+import MessageModel from "../../models/Message"
 import {Button} from "react-bootstrap"
 import {useHistory} from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
 
-function Room({ room, messages, sendMessage, closeRoomConnection, user} : {room : RoomModel, messages : Message[], sendMessage : any, closeRoomConnection : any, user: UserModel}) {
+function Room({ room, messages, sendMessage, closeRoomConnection, user} : {room : RoomModel, messages : MessageModel[], sendMessage : any, closeRoomConnection : any, user: UserModel}) {
     const history = useHistory();
 
     if (room.userModels.length === 0){

@@ -130,6 +130,7 @@ namespace Cards.Hubs
         {
             var newAdmin = currentRoom.UserModels[0];
             newAdmin.IsAdmin = true;
+            currentRoom.Admin = newAdmin;
             return newAdmin;
         }
 
@@ -137,6 +138,7 @@ namespace Cards.Hubs
         {
             user.Id = Guid.NewGuid();
             user.ConnectionId = Context.ConnectionId;
+            user.IsAdmin = true;
             var room = _roomManager.CreateRoom(roomName, user);
             user.RoomId = room.Id;
             return room;

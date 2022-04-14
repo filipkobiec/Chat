@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FormControl, InputGroup, Button, Form } from "react-bootstrap"
-import UserModel from "../models/UserModel";
+import UserModel from "../../../models/UserModel";
 
 function SendMessageForm({user, sendMessage } : {user : UserModel, sendMessage : any}) {
     const [message, setMessage] = useState('');

@@ -1,0 +1,26 @@
+.message-container{
+    display: flex;
+}
+.user-message-container{
+    justify-content: flex-end;
+}
+.message{
+    display: flex;
+    flex-direction: column;
+}
+
+.message-text{
+    padding: 10px;
+    border-radius: 10px;
+    background-color: aliceblue;
+}
+
+.user-message-text{
+    background-color: rgb(0, 132, 255);
+    color: white;
+    margin-bottom: 2px;
+}
+
+.from-user{
+    text-align: right;
+}

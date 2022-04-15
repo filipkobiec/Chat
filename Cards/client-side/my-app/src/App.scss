@@ -41,7 +41,7 @@ hr.line {
 
 .custom-default-btn:disabled{
   background-color: $button-color-disabled;
-  font: $third-font-color;
+  font: $disabled-button-font-color;
 }
 
 @media (max-width: $breakpoint-xl) {

@@ -5,7 +5,7 @@ Form Button {
 }
 
 h2, h3 {
-  color: $main-font-color;
+  color: $header-font-color;
 }
 
 hr.line {
@@ -35,13 +35,13 @@ hr.line {
   background-color: $button-color;
   border-radius: 4px;
   padding: 5px;
-  color: $main-font-color;
+  color: $active-button-color;
   border: none;
 }
 
 .custom-default-btn:disabled{
   background-color: $button-color-disabled;
-  font: $disabled-button-font-color;
+  color: $disabled-button-color;
 }
 
 @media (max-width: $breakpoint-xl) {

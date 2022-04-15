@@ -1,9 +1,18 @@
+@import "/src/sass/variables";
+
 .chatBox{
-    max-width: 1200px;
-    background-color: white;
+    background-color: $card-color;
     height: 400px;
     display: flex;
     flex-direction: column;
     padding: 10px;
     overflow-y: scroll;
+    border-radius: $card-border-radious;
 }
+
+.trackY{
+    background: white !important;
+}
+
+
+

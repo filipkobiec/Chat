@@ -43,3 +43,9 @@ hr.line {
   background-color: $button-color-disabled;
   font: $third-font-color;
 }
+
+@media (max-width: $breakpoint-xl) {
+  .app{  
+      padding: 20px;
+  }
+}

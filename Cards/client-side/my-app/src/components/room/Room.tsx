@@ -5,6 +5,7 @@ import {useHistory} from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
 import UsersList from "./Chat/UsersList";
+import styles from "./Room.module.scss"
 
 function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRoom, user} : {room : RoomModel, messages : MessageModel[], sendMessage : any, closeRoomConnection : any, kickUserFromRoom: any, user: UserModel}) {
     const history = useHistory();
@@ -12,7 +13,7 @@ function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRo
     if (user.name === ''){
         return(
             <div>
-                <p>Please visit main page in order to select or create room</p>
+                <p style={{color: "white"}}>Please visit main page in order to select or create room</p>
                 <Button variant='danger' onClick={() => {
                         closeRoomConnection();
                         history.push("/");
@@ -31,9 +32,12 @@ function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRo
                     }}
                     >Leave Room</Button>
                 </div>
-                <UsersList user={user} room={room} kickUserFromRoom={kickUserFromRoom}/>
-                <Chat user={user} messages = {messages} sendMessage = {sendMessage}></Chat>
+                <div className={styles.chatContainer}>
+                    <UsersList user={user} room={room} kickUserFromRoom={kickUserFromRoom}/>
+                    <Chat user={user} messages = {messages} sendMessage = {sendMessage}></Chat>
+                </div>
             </div>
+
         )
     }
     

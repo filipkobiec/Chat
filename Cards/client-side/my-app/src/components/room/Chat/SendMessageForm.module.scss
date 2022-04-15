@@ -1,0 +1,25 @@
+@import "/src/sass/variables";
+
+.form{
+    display: flex;
+    padding-top: 10px;
+}
+
+.input{
+    background: none;
+    border: 2px solid white;
+    border-right: 0;
+    border-radius: $card-border-radious 0 0 $card-border-radious;
+    padding-left: 10px;
+    width: 100%;
+    color: $main-font-color;
+}
+
+.input:focus-visible{
+    outline: none;
+}
+
+.btn{
+    width: 80px;
+    border-radius: 0 4px 4px 0;
+}

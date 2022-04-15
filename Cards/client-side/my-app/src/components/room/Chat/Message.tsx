@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import MessageModel from "../../../models/Message";
 import UserModel from "../../../models/UserModel";
 import './Message.scss'; 
@@ -21,10 +20,10 @@ function Message({ user, message } : { user:UserModel, message:MessageModel }){
     return (
     <div className={`${className}-message-container message-container`}>
         <div className="message">
-            <div className={`${className}-message-text message-text`}>{message.message}</div>
             {className !== "user" && 
                 <div className="from-user">{message.user}</div>
             }
+            <div className={`${className}-message-text message-text`}>{message.message}</div>
         </div>
     </div>
     )

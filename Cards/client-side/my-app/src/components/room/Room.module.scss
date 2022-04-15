@@ -1,0 +1,10 @@
+@import "/src/sass/variables";
+
+.chatContainer{
+    display: flex;
+}
+@media (max-width: $breakpoint-tablet) {
+  .chatContainer{
+      flex-direction: column;
+  }
+}

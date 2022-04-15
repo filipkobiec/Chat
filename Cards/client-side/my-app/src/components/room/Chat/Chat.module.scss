@@ -1,0 +1,13 @@
+@import "/src/sass/variables";
+
+.chat{
+    width: 80%;
+    background-color: $card-color;
+    border-radius: $card-border-radious;
+}
+
+@media (max-width: $breakpoint-tablet) {
+    .chat{  
+        width: 100%;
+    }
+}

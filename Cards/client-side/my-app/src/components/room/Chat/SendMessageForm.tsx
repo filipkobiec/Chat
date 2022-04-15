@@ -1,27 +1,20 @@
 import { useState } from "react";
-import { FormControl, InputGroup, Button, Form } from "react-bootstrap"
 import UserModel from "../../../models/UserModel";
+import styles from "./SendMessageForm.module.scss"
 
 function SendMessageForm({user, sendMessage } : {user : UserModel, sendMessage : any}) {
     const [message, setMessage] = useState('');
     return (
-        <Form
-            onSubmit={e => {
-                e.preventDefault();
-                sendMessage(user, message);
-                setMessage('');
-            }}>
-            <InputGroup>
-                <FormControl placeholder="message..."
-                    onChange={e => setMessage(e.target.value)}
-                    value={message}/>
-                <InputGroup.Append>
-                    <Button variant="primary" type="submit"
-                        disabled={!message}
-                    >Send</Button>
-                </InputGroup.Append>
-            </InputGroup>
-        </Form>
+        <form className={styles.form} onSubmit={e => {
+                     e.preventDefault();
+                     sendMessage(user, message);
+                     setMessage('');
+                }}>
+            <input className={styles.input} onChange={e => setMessage(e.target.value)}
+                value={message} placeholder="message..."/>
+            <button className={`custom-default-btn  ${styles.btn}`} type="submit" disabled={!message}>Send</button>
+
+      </form>
     )
 }
 

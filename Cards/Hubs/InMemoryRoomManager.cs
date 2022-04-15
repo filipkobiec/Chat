@@ -15,13 +15,6 @@ namespace Cards.Hubs
             _rooms = new ConcurrentDictionary<Guid, RoomModel>();
         }
 
-        public RoomModel AddUserToRoom(Guid roomId, UserModel user)
-        {
-            var room = _rooms[roomId];
-            room.UserModels.Add(user);
-            return room;
-        }
-
         public RoomModel CreateRoom(string roomName, UserModel admin)
         {
             var newRoom = new RoomModel(roomName, admin);
@@ -37,5 +30,33 @@ namespace Cards.Hubs
 
         public bool RemoveRoom(Guid roomId) => _rooms.Remove(roomId);
 
+        public RoomModel AddUserToRoom(Guid roomId, UserModel user)
+        {
+            var room = _rooms[roomId];
+            room.UserModels.Add(user);
+            return room;
+        }
+
+        public UserModel GetUserFromRoom(Guid roomId, Guid userId)
+        {
+            var room = _rooms[roomId];
+            var roomUsers = room.UserModels;
+            var user = roomUsers.SingleOrDefault(u => u.Id == userId);
+            return user;
+        }
+
+        public bool DoesUserWithSameNameExist(string name, RoomModel room) => room.UserModels.Any(u => u.Name == name);
+
+        public RoomModel RemoveUserFromRoom(Guid roomId, UserModel user)
+        {
+            var room = _rooms[roomId];
+
+            if (user != null)
+            {
+                room.UserModels.Remove(user);
+            }
+
+            return room;
+        }
     }
 }

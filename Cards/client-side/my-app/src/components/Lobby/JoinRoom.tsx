@@ -29,7 +29,7 @@ function JoinRoom({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
                     rooms.map((element, index) => 
                             (<div key={index}>
                                 <h3>{element.roomName}</h3>
-                                <Button variant="success" type="submit" disabled={!user} onClick={() => {roomName=element.roomName; roomId = element.id}}>Join</Button>
+                                <button className="custom-default-btn"  type="submit" disabled={!user} onClick={() => {roomName=element.roomName; roomId = element.id}}>Join</button>
                             </div>
                         )
                 )}

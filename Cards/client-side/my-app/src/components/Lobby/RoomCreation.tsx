@@ -21,7 +21,7 @@ function RoomCreation({ createRoom, user}: {createRoom : any, user : UserModel})
                     <Form.Control placeholder="name" onChange={e => user.name = e.target.value} />
                     <Form.Control placeholder="room" onChange={e => setRoom(e.target.value)} />
                 </Form.Group>
-                <Button variant="success" type="submit" disabled={!user || !room }>Join</Button>
+                <button className="custom-default-btn" type="submit" disabled={!user || !room }>Join</button>
             </Form>
          </div>
 

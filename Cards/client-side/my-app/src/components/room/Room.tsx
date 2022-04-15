@@ -4,6 +4,7 @@ import {Button} from "react-bootstrap"
 import {useHistory} from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
+import UsersList from "./Chat/UsersList";
 
 function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRoom, user} : {room : RoomModel, messages : MessageModel[], sendMessage : any, closeRoomConnection : any, kickUserFromRoom: any, user: UserModel}) {
     const history = useHistory();
@@ -30,35 +31,7 @@ function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRo
                     }}
                     >Leave Room</Button>
                 </div>
-                <div>
-                    {room.userModels.map((p, index) => {
-                        if (p.isAdmin) {
-                            return (
-                                <div key={index}>
-                                    <div>
-                                        {p.name}
-                                    </div>
-                                    <div>
-                                        Admin
-                                    </div>
-                                </div>
-                            )
-                        }
-                        return (
-                            <div key={index}>
-                                <div>
-                                    {p.name}
-                                </div>
-                                {user.isAdmin &&
-                                    <Button onClick={() => {
-                                        kickUserFromRoom(room.id, p.id);
-                                    }}>Kick</Button>
-                                }
-                            </div>
-                        )
-                    }
-                    )}
-                </div>
+                <UsersList user={user} room={room} kickUserFromRoom={kickUserFromRoom}/>
                 <Chat user={user} messages = {messages} sendMessage = {sendMessage}></Chat>
             </div>
         )

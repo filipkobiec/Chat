@@ -6,6 +6,7 @@ import styles from './RoomCreation.module.scss';
 
 function RoomCreation({ createRoom, user}: {createRoom : any, user : UserModel}) {
     const [room, setRoom] = useState('');
+    const [username, setUsername] = useState('');
     const history = useHistory();
     return (
          <div className={styles.roomCreation}>
@@ -13,12 +14,13 @@ function RoomCreation({ createRoom, user}: {createRoom : any, user : UserModel})
             <Form 
                 onSubmit={e => {
                     e.preventDefault();
+                    user.name = username;
                     createRoom(user, room);
                     history.push(`room/${room}`)
                 }}
             >
                 <Form.Group>
-                    <Form.Control placeholder="name" onChange={e => user.name = e.target.value} />
+                    <Form.Control placeholder="name" onChange={e => setUsername(e.target.value)} />
                     <Form.Control placeholder="room" onChange={e => setRoom(e.target.value)} />
                 </Form.Group>
                 <button className="custom-default-btn" type="submit" disabled={!user || !room }>Join</button>

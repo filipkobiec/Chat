@@ -20,7 +20,5 @@ namespace Cards.Hubs
             UserModels.Add(admin);
             Admin = admin;
         }
-
-        public bool RemoveUser(UserModel user) => UserModels.Remove(user);
     }
 }

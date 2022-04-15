@@ -5,18 +5,18 @@ import {useHistory} from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
 
-function Room({ room, messages, sendMessage, closeRoomConnection, user} : {room : RoomModel, messages : MessageModel[], sendMessage : any, closeRoomConnection : any, user: UserModel}) {
+function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRoom, user} : {room : RoomModel, messages : MessageModel[], sendMessage : any, closeRoomConnection : any, kickUserFromRoom: any, user: UserModel}) {
     const history = useHistory();
 
-    if (room.userModels.length === 0){
+    if (user.name === ''){
         return(
             <div>
-                disconnected
+                <p>Please visit main page in order to select or create room</p>
                 <Button variant='danger' onClick={() => {
                         closeRoomConnection();
                         history.push("/");
                     }}
-                    >Leave Room</Button>
+                    >Get back to main menu</Button>
             </div>
         )
     }
@@ -35,21 +35,26 @@ function Room({ room, messages, sendMessage, closeRoomConnection, user} : {room 
                         if (p.isAdmin) {
                             return (
                                 <div key={index}>
-                                <div>
-                                    {p.name}
+                                    <div>
+                                        {p.name}
+                                    </div>
+                                    <div>
+                                        Admin
+                                    </div>
                                 </div>
-                                <div>
-                                    Admin
-                                </div>
-                            </div>
                             )
                         }
                         return (
                             <div key={index}>
-                            <div>
-                                {p.name}
+                                <div>
+                                    {p.name}
+                                </div>
+                                {user.isAdmin &&
+                                    <Button onClick={() => {
+                                        kickUserFromRoom(room.id, p.id);
+                                    }}>Kick</Button>
+                                }
                             </div>
-                        </div>
                         )
                     }
                     )}
@@ -61,4 +66,4 @@ function Room({ room, messages, sendMessage, closeRoomConnection, user} : {room 
     
 }
 
-export default Room 
+export default Room

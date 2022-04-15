@@ -25,15 +25,21 @@ namespace Cards.Hubs
             RoomModel room = CreateRoomWithAdmin(user, roomName);
             await SendInformationAboutUserToClient(room, user);
             await SendRoomsToClients();
-            await UpdateClientRoom(user, room);
+            await UpdateClientsRoom(room);
         }
         public async Task JoinRoom(UserModel user, Guid roomId)
         {
             var room = _roomManager.GetRoom(roomId);
-            AssignUserToRoom(user, room);
-            await SendInformationAboutUserToClient(room, user);
-            _roomManager.AddUserToRoom(roomId, user);
-            await UpdateClientRoom(user, room);
+
+            if (_roomManager.DoesUserWithSameNameExist(user.Name, room))
+                await Clients.Client(Context.ConnectionId).SendAsync("DisplaySameNameError");
+            else
+            {
+                AssignUserToRoom(user, room);
+                await SendInformationAboutUserToClient(room, user);
+                _roomManager.AddUserToRoom(roomId, user);
+                await UpdateClientsRoom(room);
+            }
         }
 
         public async Task SendMessage(UserModel user, string message)
@@ -48,6 +54,13 @@ namespace Cards.Hubs
             await SendRoomsToClients();
         }
 
+        public async Task KickUserFromRoom (Guid roomId, Guid userId)
+        {
+            var user = _roomManager.GetUserFromRoom(roomId, userId);
+            var room = _roomManager.RemoveUserFromRoom(roomId, user);
+            await RedirectUserToMainMenu(user);
+            await UpdateClientsRoom(room);
+        }
 
         public async Task CloseRoomConnection()
         {
@@ -74,10 +87,9 @@ namespace Cards.Hubs
             if (isUserRegistered)
             {
                 var currentRoom = _roomManager.GetRoom(user.RoomId);
-                currentRoom.UserModels.Remove(user);
-                _connections.Remove(Context.ConnectionId);
+                RemoveAllUserData(user, currentRoom);
 
-                if (currentRoom.UserModels.Count == 0)
+                if (currentRoom.IsRoomEmpty)
                 {
                     _roomManager.RemoveRoom(currentRoom.Id);
                     Clients.Group("Lobby")
@@ -85,17 +97,18 @@ namespace Cards.Hubs
                 }
                 else
                 {
+                    UserModel newAdmin = SetupNewAdmin(currentRoom);
+                    Clients.Client(newAdmin.ConnectionId).SendAsync("SetUser", newAdmin);
                     Clients.Group(currentRoom.Id.ToString())
                         .SendAsync("ReceiveMessage", _botUser, $"{user.Name} has left");
                     Clients.Group(currentRoom.Id.ToString())
                         .SendAsync("UpdateRoom", currentRoom);
                 }
             }
-
             return base.OnDisconnectedAsync(exception);
         }
 
-        private async Task UpdateClientRoom(UserModel user, RoomModel currentRoom)
+        private async Task UpdateClientsRoom(RoomModel currentRoom)
         {
             await Clients.Group(currentRoom.Id.ToString()).SendAsync("UpdateRoom", currentRoom);
         }
@@ -119,6 +132,7 @@ namespace Cards.Hubs
         private async Task HandleUserLeavingRoom(UserModel user, RoomModel currentRoom)
         {
             UserModel newAdmin = SetupNewAdmin(currentRoom);
+            currentRoom.Admin = newAdmin;
             await Clients.Group(currentRoom.Id.ToString())
                .SendAsync("ReceiveMessage", _botUser, $"{user.Name} has left");
             await SendRoomsToClients();
@@ -165,6 +179,11 @@ namespace Cards.Hubs
         private async Task PlaceUserInLobby(UserModel user)
         {
             await Groups.AddToGroupAsync(user.ConnectionId, "Lobby");
+        }
+
+        private async Task RedirectUserToMainMenu(UserModel user)
+        {
+            await Clients.Client(user.ConnectionId).SendAsync("RedirectUserToMainMenu");
         }
     }
 }

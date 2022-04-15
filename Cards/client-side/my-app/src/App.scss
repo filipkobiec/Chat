@@ -1,17 +1,15 @@
+@import "/src/sass/variables";
+
 Form Button {
   width: 100%;
 }
 
-h2 {
-  color: #313131;
-}
-
-h6 {
-  color: greenyellow;
+h2, h3 {
+  color: $main-font-color;
 }
 
 hr.line {
-  border: 1px solid #313131;
+  border: 1px solid $main-font-color;
   width: 100%;
 }
 
@@ -27,17 +25,21 @@ hr.line {
   margin-bottom: 4px;
 }
 
-.user-list {
-  float: left;
-  background-color: #313131;
-  color:white;
-  width: 200px;
-  height: 440px;
-  margin-right: 4px;
-}
-
 .from-user {
   font-size: small;
   margin-bottom: 3px;
   margin-right: 5px;
+}
+
+.custom-default-btn{
+  background-color: $button-color;
+  border-radius: 4px;
+  padding: 5px;
+  color: $main-font-color;
+  border: none;
+}
+
+.custom-default-btn:disabled{
+  background-color: $button-color-disabled;
+  font: $third-font-color;
 }

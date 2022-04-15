@@ -8,7 +8,10 @@
 }
 .message{
     display: flex;
+    text-align: left;
     flex-direction: column;
+    max-width: 40%;
+    overflow-wrap: break-word;
 }
 
 .message-text{

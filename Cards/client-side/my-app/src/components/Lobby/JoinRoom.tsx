@@ -5,7 +5,9 @@ import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
 import styles from './JoinRoom.module.scss'; 
 
-function JoinRoom({joinRoom, rooms} : {joinRoom : any, rooms: RoomModel[]}) {
+type JoinRoomFunction = (user: UserModel, room: string) => void;
+
+function JoinRoom({joinRoom, rooms} : {joinRoom : JoinRoomFunction, rooms: RoomModel[]}) {
     
     const [user, setUser] = useState('');
     const history = useHistory();

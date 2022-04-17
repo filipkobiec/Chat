@@ -2,7 +2,9 @@ import styles from "./UsersList.module.scss"
 import UserModel from "../../../models/UserModel";
 import RoomModel from "../../../models/RoomModel";
 
-function UsersList({user, room, kickUserFromRoom} : {user: UserModel, room : RoomModel, kickUserFromRoom: any}) {
+export type KickUserFromRoomFunction = (roomId: string, userId: string) => void;
+
+function UsersList({user, room, kickUserFromRoom} : {user: UserModel, room : RoomModel, kickUserFromRoom: KickUserFromRoomFunction}) {
     return(
         <div className={styles.listContainer}>
             {room.userModels.map((p, index) => {

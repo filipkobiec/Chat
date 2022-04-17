@@ -4,10 +4,13 @@ import {Button} from "react-bootstrap"
 import {useHistory} from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import RoomModel from "../../models/RoomModel";
-import UsersList from "./Chat/UsersList";
+import UsersList, { KickUserFromRoomFunction } from "./Chat/UsersList";
 import styles from "./Room.module.scss"
+import { SendMessageFunction } from "./Chat/SendMessageForm";
 
-function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRoom, user} : {room : RoomModel, messages : MessageModel[], sendMessage : any, closeRoomConnection : any, kickUserFromRoom: any, user: UserModel}) {
+type CloseRoomConnectionFunction = () => void;
+
+function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRoom, user} : {room : RoomModel, messages : MessageModel[], sendMessage : SendMessageFunction, closeRoomConnection : CloseRoomConnectionFunction, kickUserFromRoom: KickUserFromRoomFunction, user: UserModel}) {
     const history = useHistory();
 
     if (user.name === ''){

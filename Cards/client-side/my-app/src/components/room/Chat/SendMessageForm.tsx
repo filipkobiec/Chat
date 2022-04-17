@@ -1,8 +1,11 @@
+import { type } from "os";
 import { useState } from "react";
 import UserModel from "../../../models/UserModel";
 import styles from "./SendMessageForm.module.scss"
 
-function SendMessageForm({user, sendMessage } : {user : UserModel, sendMessage : any}) {
+export type SendMessageFunction = (user: UserModel, message: string) => void;
+
+function SendMessageForm({user, sendMessage } : {user : UserModel, sendMessage : SendMessageFunction}) {
     const [message, setMessage] = useState('');
     return (
         <form className={styles.form} onSubmit={e => {

@@ -4,7 +4,9 @@ import { useHistory } from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import styles from './RoomCreation.module.scss'; 
 
-function RoomCreation({ createRoom, user}: {createRoom : any, user : UserModel}) {
+type CreateRoomFunction = (user: UserModel, room: string) => void;
+
+function RoomCreation({ createRoom, user}: {createRoom : CreateRoomFunction, user : UserModel}) {
     const [room, setRoom] = useState('');
     const [username, setUsername] = useState('');
     const history = useHistory();

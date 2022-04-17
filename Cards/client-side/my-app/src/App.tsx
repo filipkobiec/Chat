@@ -77,7 +77,6 @@ function App() {
             }
         }
     }
-
     const createRoom = async (user: UserModel, roomName: string) => {
         setMessages([])
         try {

@@ -11,11 +11,11 @@ namespace Cards.Hubs
         public UserModel Admin { get; set; }
         public bool IsRoomEmpty => UserModels.Count == 0;
         public List<UserModel> UserModels { get; set; }
-        public string roomName { get; }
+        public string RoomName { get; }
         public RoomModel(string roomName, UserModel admin)
         {
             Id = Guid.NewGuid();
-            this.roomName = roomName;
+            RoomName = roomName;
             UserModels = new List<UserModel>();
             UserModels.Add(admin);
             Admin = admin;

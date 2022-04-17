@@ -24,24 +24,45 @@ namespace Cards.Hubs
 
         public ICollection<RoomModel> GetAllRooms() => _rooms.Values;
 
-        public RoomModel GetRoom(Guid roomId) => _rooms[roomId];
+        public RoomModel GetRoom(Guid roomId)
+        {
+            _rooms.TryGetValue(roomId, out var room);
+            return room;
+        }
 
         public bool IsRoomCreated(Guid roomId) => _rooms.ContainsKey(roomId);
 
-        public bool RemoveRoom(Guid roomId) => _rooms.Remove(roomId);
+        public RoomModel RemoveRoom(Guid roomId)
+        {
+            _rooms.TryGetValue(roomId, out var room);
+            if (room != null)
+            {
+                _rooms.Remove(roomId);
+            }
+
+            return room;
+        }
 
         public RoomModel AddUserToRoom(Guid roomId, UserModel user)
         {
-            var room = _rooms[roomId];
-            room.UserModels.Add(user);
+            _rooms.TryGetValue(roomId, out var room);
+            if (room != null)
+                room.UserModels.Add(user);
+
             return room;
         }
 
         public UserModel GetUserFromRoom(Guid roomId, Guid userId)
         {
-            var room = _rooms[roomId];
-            var roomUsers = room.UserModels;
-            var user = roomUsers.SingleOrDefault(u => u.Id == userId);
+            _rooms.TryGetValue(roomId, out var room);
+            UserModel user = null;
+            if (room != null)
+            {
+                var roomUsers = room.UserModels;
+                user = roomUsers.SingleOrDefault(u => u.Id == userId);
+
+            }
+
             return user;
         }
 
@@ -49,7 +70,7 @@ namespace Cards.Hubs
 
         public RoomModel RemoveUserFromRoom(Guid roomId, UserModel user)
         {
-            var room = _rooms[roomId];
+            _rooms.TryGetValue(roomId, out var room);
 
             if (user != null)
             {
@@ -58,5 +79,7 @@ namespace Cards.Hubs
 
             return room;
         }
+
+        public bool DoesRoomWithSameNameExist(string name) => _rooms.Values.Any(r => r.RoomName == name);
     }
 }

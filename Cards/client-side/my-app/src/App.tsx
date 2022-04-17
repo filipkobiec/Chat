@@ -10,12 +10,14 @@ import UserModel from "./models/UserModel";
 import RoomModel from "./models/RoomModel"
 import JoinRoom from "./components/Lobby/JoinRoom"
 import {
-    BrowserRouter as Router,
+    Router,
     Route,
     Switch,
 } from "react-router-dom";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import NoServerConnection from "./components/Errors/NoServerConnection/NoServerConnection";
+import ErrorModal from "./components/Errors/ErrorModal/ErrorModal";
+import history from './components/History'
 
 
 
@@ -27,7 +29,8 @@ function App() {
     const [rooms, setRooms] = useState<RoomModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isErrorWithConnection, setIsErrorWithConnection] = useState(false);
-    
+    const [modalMessage, setModalMessage] = useState("");
+
     useEffect(() => {
         makeConnection();
     }, [])
@@ -52,11 +55,19 @@ function App() {
             })
 
             connection.on("RedirectUserToMainMenu", () => {
-                window.location.href="/"
+                history.push("/")
+            })
+
+            connection.on("RedirectToRoom", (roomName: string) => {
+                history.push(`room/${roomName}`)
             })
 
             connection.on("SetUser", (user: UserModel) => {
                 setUser(user);
+            })
+
+            connection.on("SetModalMessage", (message: string) => {
+                setModalMessage(message);
             })
 
             connection.onclose(e => {
@@ -111,9 +122,9 @@ function App() {
         }
     }
 
-    const closeRoomConnection = async () => {
+    const closeRoomConnection = async (roomId: string, userId: string) => {
         try {
-            await connection?.invoke("CloseRoomConnection");
+            await connection?.invoke("CloseRoomConnection", roomId, userId);
         } catch (e) {
             console.log(e)
         }
@@ -124,9 +135,10 @@ function App() {
         <div className="app">
             {isLoading && <LoadingSpinner />}
             {isErrorWithConnection && <NoServerConnection />}
+            {modalMessage && <ErrorModal message={modalMessage} setMessage={setModalMessage}/>}
             <h2>Chat</h2>
             <hr className="line" />
-            <Router>
+            <Router history={history}>
                 <Switch>
                     <Route exact path="/">
                         <RoomCreation createRoom={createRoom} user={user}/>

@@ -8,7 +8,7 @@ import UsersList, { KickUserFromRoomFunction } from "./Chat/UsersList";
 import styles from "./Room.module.scss"
 import { SendMessageFunction } from "./Chat/SendMessageForm";
 
-type CloseRoomConnectionFunction = () => void;
+type CloseRoomConnectionFunction = (roomId: string, userId: string) => void;
 
 function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRoom, user} : {room : RoomModel, messages : MessageModel[], sendMessage : SendMessageFunction, closeRoomConnection : CloseRoomConnectionFunction, kickUserFromRoom: KickUserFromRoomFunction, user: UserModel}) {
     const history = useHistory();
@@ -18,7 +18,6 @@ function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRo
             <div>
                 <p style={{color: "white"}}>Please visit main page in order to select or create room</p>
                 <Button variant='danger' onClick={() => {
-                        closeRoomConnection();
                         history.push("/");
                     }}
                     >Get back to main menu</Button>
@@ -30,8 +29,7 @@ function Room({ room, messages, sendMessage, closeRoomConnection, kickUserFromRo
             <div>
                 <div className="leave-room">
                     <Button variant='danger' onClick={() => {
-                        closeRoomConnection();
-                        history.push("/");
+                        closeRoomConnection(room.id, user.id);
                     }}
                     >Leave Room</Button>
                 </div>

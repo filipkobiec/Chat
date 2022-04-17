@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Form } from "react-bootstrap"
-import { useHistory } from "react-router-dom"
 import UserModel from "../../models/UserModel";
 import styles from './RoomCreation.module.scss'; 
 
@@ -9,7 +8,6 @@ type CreateRoomFunction = (user: UserModel, room: string) => void;
 function RoomCreation({ createRoom, user}: {createRoom : CreateRoomFunction, user : UserModel}) {
     const [room, setRoom] = useState('');
     const [username, setUsername] = useState('');
-    const history = useHistory();
     return (
          <div className={styles.roomCreation}>
             <h2>Create Room</h2>
@@ -18,7 +16,6 @@ function RoomCreation({ createRoom, user}: {createRoom : CreateRoomFunction, use
                     e.preventDefault();
                     user.name = username;
                     createRoom(user, room);
-                    history.push(`room/${room}`)
                 }}
             >
                 <Form.Group>
